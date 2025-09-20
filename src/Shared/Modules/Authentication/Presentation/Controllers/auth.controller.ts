@@ -52,30 +52,39 @@ export class AuthController {
   async login(@Req() req, @Res({ passthrough: true }) res: Response) {
     // req.user sudah valid, berisi user object
     const tokenDto = await this.LoginUseCase.execute(req.user);
+    console.log(req.user);
+    console.log(tokenDto);
 
     res.cookie('access_token', tokenDto.accessToken, {
+      // domain: 'local',
+      // path: '/', // tambahkan ini!
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: false,
+      sameSite: 'none', // process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 1000 * 60 * 60,
     });
 
-    return { message: 'Login success' };
+    return {
+      message: 'Login success',
+      role: req.user.usertype,
+      type: req.user.type,
+      // role: req.user, role};
+    };
+
+    // User: hanya yang punya role 'user' atau 'admin'
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(USERTYPE.SUPERADMIN, USERTYPE.ADMIN) // !tambahin cooo
+    // @Get('me')
+    // async getProfile(@Req() req) {
+    //   return { message: 'Profil user terverifikasi', user: req.user };
+    // }
+
+    // // Admin only
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(USERTYPE.SUPERADMIN)
+    // @Get('superadmin')
+    // async getAdminData() {
+    //   return { message: 'Halo Admin, data rahasia aman nih 🔐' };
+    // }
   }
-
-  // User: hanya yang punya role 'user' atau 'admin'
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(USERTYPE.SUPERADMIN, USERTYPE.ADMIN) // !tambahin cooo
-  // @Get('me')
-  // async getProfile(@Req() req) {
-  //   return { message: 'Profil user terverifikasi', user: req.user };
-  // }
-
-  // // Admin only
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(USERTYPE.SUPERADMIN)
-  // @Get('superadmin')
-  // async getAdminData() {
-  //   return { message: 'Halo Admin, data rahasia aman nih 🔐' };
-  // }
 }

@@ -1,6 +1,6 @@
 export class LoanApplicationEntity {
   id?: string;
-  marketing_id: number;
+  marketing_id?: number;
 
   client_internal: any;
   address_internal?: any;

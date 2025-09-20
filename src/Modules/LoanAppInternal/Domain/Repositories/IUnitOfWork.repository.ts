@@ -5,10 +5,12 @@ import { IFamilyInternalRepository } from "./family-internal.repository";
 import { IJobInternalRepository } from "./job-internal.repository";
 import { ILoanApplicationInternalRepository } from "./loanApp-internal.repository";
 import { IRelativeInternalRepository } from "./relatives-internal.repository";
+import { IApprovalInternalRepository } from "./approval-internal.repository";
 
 export interface IUnitOfWork {
   clientRepo: IClientInternalRepository;
   addressRepo: IAddressInternalRepository;
+  approvalRepo: IApprovalInternalRepository
   collateralRepo: ICollateralInternalRepository;
   familyRepo: IFamilyInternalRepository;
   jobRepo: IJobInternalRepository;

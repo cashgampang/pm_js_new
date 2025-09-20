@@ -6,14 +6,15 @@ import { ModuleLoanApplicationInternal } from './Modules/LoanAppInternal/ModuleL
 import { ModuleLoanApplicationExternal } from './Modules/LoanAppExternal/ModuleLoanApplicationExternal.module';
 import { UsersModule } from './Modules/Users/ModuleUsers.module';
 import { AuthModule } from './Shared/Modules/Authentication/ModuleAuth.module';
-import { ModuleDrafts } from './Shared/Modules/Drafts/ModuleDrafts.module';
-import { ModuleNotifications } from './Shared/Modules/Notifications/ModuleNotification.module';
+import { DraftsModule } from './Shared/Modules/Drafts/ModuleDrafts.module';
+import { NotificationsModule } from './Shared/Modules/Notifications/ModuleNotification.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { join } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MarketingInternalUseCaseModule } from './Modules/Users/Roles/Marketing-Internal/marketing-internal.module';
+import { SupervisorInternalUseCaseModule } from './Modules/Users/Roles/Supervisor-Internal/supervisor-internal.module';
 import { PersistenceLoanAppModule } from './Modules/LoanAppInternal/PersistenceLoanAppModule.module';
 
 @Module({
@@ -41,14 +42,20 @@ import { PersistenceLoanAppModule } from './Modules/LoanAppInternal/PersistenceL
       rootPath: join(__dirname, '..', 'uploads'), // path fisik folder
       serveRoot: '/uploads', // URL prefix
     }),
+
+    //? --- Boundaries Modules ---
     ModuleLoanApplicationInternal,
     ModuleLoanApplicationExternal,
     UsersModule,
     AuthModule,
-    ModuleDrafts,
-    ModuleNotifications,
+    DraftsModule,
+    NotificationsModule,
     
+    //? --- Use Cases ---
     MarketingInternalUseCaseModule,
+    SupervisorInternalUseCaseModule,
+
+    //? --- Persistence Config Modules ---
     PersistenceLoanAppModule,
   ],
   controllers: [AppController],

@@ -11,4 +11,4 @@ import { NotifCreateLoanAppIntModule } from './Modules/NotifLoanAppInt.module';
   controllers: [NotifLoanAppInternal_Controller],
   exports: [NotifCreateLoanAppIntModule],
 })
-export class ModuleNotifications {}
+export class NotificationsModule {}

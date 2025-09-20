@@ -6,12 +6,11 @@ export interface ILoanApplicationInternalRepository {
   findById(id: number): Promise<LoanApplicationInternal | null>;
   findByNasabahId(nasabahId: number): Promise<LoanApplicationInternal[]>;
   findAll(): Promise<LoanApplicationInternal[]>;
-  save(address: LoanApplicationInternal): Promise<LoanApplicationInternal>;
+  save(loan: LoanApplicationInternal): Promise<LoanApplicationInternal>;
   update(
     id: number,
-    address: Partial<LoanApplicationInternal>,
+    loan: Partial<LoanApplicationInternal>,
   ): Promise<LoanApplicationInternal>;
   delete(id: number): Promise<void>;
   callSP_MKT_GetAllLoanApplications_Internal(marketingId: number, page: number, pageSize: number): Promise<{data: any[], total: number}>;
-  // delete(id: number): Promise<void>;
 }

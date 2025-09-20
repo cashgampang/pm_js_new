@@ -10,4 +10,4 @@ import { DraftLoanApplicationModule } from './Modules/CreateLoanAppInt.module';
   //ga perlu controller, soalnya udah di define di module
   exports: [DraftLoanApplicationModule],
 })
-export class ModuleDrafts {}
+export class DraftsModule {}

@@ -1,49 +1,51 @@
-// import { Body, Controller, Post, Req } from '@nestjs/common';
-// import { SPV_ApproveOrRejectUseCase } from 'src/use-case/Supervisor-Internal/SPV_ApprovedOrReject.usecase';
-// import { ApprovalInternalStatus } from 'src/Modules/LoanAppInternal/Infrastructure/Entities/approval-internal.orm-entity';
-// import { Request } from 'express';
-// import { Public } from 'src/Shared/Modules/Authentication/public.decorator';
-// import { USERTYPE } from 'src/Modules/Users/Domain/Entities/user.entity';
-// import { SPV_RejectOrApproved_UpdateStatusLoanAppByIdService } from 'src/infrastructure/shared/InternalLoanApplications/SPV_RejectOrApproved_UpdateStatusLoanAppById.service';
+import { Body, Controller, Param, Post, Req } from '@nestjs/common';
+import { Request } from 'express';
+import { USERTYPE } from 'src/Shared/Enums/Users/Users.enum';
+import { SPV_ApproveOrRejectUseCase } from 'src/Modules/Users/Roles/Supervisor-Internal/Applications/Services/SPV_ApprovedOrReject.usecase';
+import { ApprovalInternalStatusEnum } from 'src/Shared/Enums/Internal/Approval.enum';
+import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 
-// @Controller('supervisor/int/loan-application')
-// export class SPV_ApprovedOrRejectController {
-//   constructor(
-//     private readonly approveOrRejectUseCase: SPV_ApproveOrRejectUseCase,
-//     private readonly updateStatusLoanAppService: SPV_RejectOrApproved_UpdateStatusLoanAppByIdService,
-//   ) {}
+@Controller('supervisor/int/loan-app')
+export class SPV_ApprovedOrRejectController {
+  constructor(
+    private readonly approveOrRejectUseCase: SPV_ApproveOrRejectUseCase,
+  ) {}
 
-//   @Public()
-//   @Post('approve-or-reject')
-//   async approveOrReject(
-//     @Req() req: Request,
-//     @Body()
-//     body: {
-//       loan_id: number;
-//       role: USERTYPE;
-//       status: ApprovalInternalStatus;
-//       keterangan?: string;
-//     },
-//   ) {
-//     const spv_id = Number(req.cookies['spv_id']);
+  @Post('approve-or-reject/:id')
+  async approveOrReject(
+    @Req() req: Request,
+    @Param('id') loan_id: number,
+    @Body()
+    body: {
+      status: ApprovalInternalStatusEnum;
+      keterangan?: string;
+    },
+    @CurrentUser('id') supervisorId: number,
+  ) {
+    // Ambil SPV ID dari cookie
+    if (!supervisorId) {
+      throw new Error('SPV ID tidak ditemukan di cookie');
+    }
 
-//     await this.approveOrRejectUseCase.execute(
-//       body.loan_id,
-//       spv_id,
-//       USERTYPE.SPV,
-//       body.status,
-//       body.keterangan,
-//     );
+    // Jalankan use case
+    const savedApproval = await this.approveOrRejectUseCase.execute(
+      loan_id,
+      supervisorId,
+      USERTYPE.SPV,
+      body.status,
+      body.keterangan,
+    );
 
-//     const action = body.status === ApprovalInternalStatus.APPROVED ? 'approved' : 'rejected';
-//     await this.updateStatusLoanAppService.execute(body.loan_id, action);
-
-//     return {
-//       message: `Approval berhasil disimpan dengan status ${body.status}`,
-//       data: {
-//         id: body.loan_id,
-//         status: body.status,
-//       }
-//     }
-//   }
-// }
+    // Return response
+    return {
+      message: `Approval berhasil disimpan dengan status ${body.status}`,
+      data: {
+        id: savedApproval.data.id,
+        status: savedApproval.data.status,
+        keterangan: savedApproval.data.keterangan,
+        createdAt: savedApproval.data.created,
+        updatedAt: savedApproval.data.updated,
+      },
+    };
+  }
+}

@@ -17,7 +17,8 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'http://localhost:4173',
-      'http://localhost:3000',
+      'http://app.local:3000',
+      'https://swb65h75-3000.asse.devtunnels.ms'
     ],
     credentials: true,
   });
@@ -38,7 +39,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
   console.log('Server Successfully Started');
 }
 

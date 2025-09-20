@@ -12,6 +12,7 @@ import {
   FileFieldsInterceptor,
   FilesInterceptor,
 } from '@nestjs/platform-express';
+import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 import { Public } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/public.decorator';
 
 @Controller('marketing/int/loan-application')
@@ -20,7 +21,7 @@ export class MKT_CreateLoanApplicationController {
     private readonly createLoanApplication: MKT_CreateLoanApplicationUseCase,
   ) {}
 
-  // @Public()
+  @Public()
   @Post('create')
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -34,6 +35,7 @@ export class MKT_CreateLoanApplicationController {
     ]),
   )
   async create(
+    @CurrentUser('id') marketingId: number,
     @Body() dto: any,
     @UploadedFiles()
     files: {
@@ -57,8 +59,6 @@ export class MKT_CreateLoanApplicationController {
       // parse payload kalau masih string
       const payload =
         typeof dto.payload === 'string' ? JSON.parse(dto.payload) : dto.payload;
-
-      const marketingId = 1;
 
       return await this.createLoanApplication.execute(
         payload,

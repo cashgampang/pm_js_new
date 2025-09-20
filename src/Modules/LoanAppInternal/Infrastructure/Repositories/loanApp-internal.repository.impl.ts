@@ -104,7 +104,10 @@ export class LoanApplicationInternalRepositoryImpl
   //?===================================================================================
 
   async findById(id: number): Promise<LoanApplicationInternal | null> {
-    const ormEntity = await this.ormRepository.findOne({ where: { id } });
+    const ormEntity = await this.ormRepository.findOne({
+      where: { id },
+      relations: ['nasabah_id'], 
+    });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
@@ -142,7 +145,11 @@ export class LoanApplicationInternalRepositoryImpl
     return ormEntities.map(this.toDomain);
   }
 
-  async callSP_MKT_GetAllLoanApplications_Internal(marketingId: number, page: number, pageSize: number): Promise<{data: any[], total: number}> {
+  async callSP_MKT_GetAllLoanApplications_Internal(
+    marketingId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
     const ormEntities = this.ormRepository.manager;
     const result = await ormEntities.query(
       `CALL MKT_GetAllLoanApplications_Internal(?, ?, ?);`,

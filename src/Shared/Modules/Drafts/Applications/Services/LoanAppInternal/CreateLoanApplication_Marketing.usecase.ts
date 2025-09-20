@@ -9,7 +9,8 @@ export class CreateDraftLoanApplicationUseCase {
     private readonly loanAppDraftRepo: ILoanApplicationDraftRepository,
   ) {}
 
-  async executeCreateDraft(marketingId: number, dto: CreateDraftLoanApplicationDto) {
+  async executeCreateDraft
+  (marketingId: number, dto: CreateDraftLoanApplicationDto) {
     try {
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,

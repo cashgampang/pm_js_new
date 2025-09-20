@@ -27,6 +27,9 @@ import { FamilyInternal_ORM_Entity } from '../Entities/family-internal.orm-entit
 import { JobInternal_ORM_Entity } from '../Entities/job-internal.orm-entity';
 import { LoanApplicationInternal_ORM_Entity } from '../Entities/loan-application-internal.orm-entity';
 import { RelativeInternal_ORM_Entity } from '../Entities/relative-internal.orm-entity';
+import { IApprovalInternalRepository } from '../../Domain/Repositories/approval-internal.repository';
+import { ApprovalInternalRepositoryImpl } from './approval-internal.repository.impl';
+import { ApprovalInternal_ORM_Entity } from '../Entities/approval-internal.orm-entity';
 
 export class TypeOrmUnitOfWork implements IUnitOfWork {
   private queryRunner: QueryRunner | null = null;
@@ -51,6 +54,13 @@ export class TypeOrmUnitOfWork implements IUnitOfWork {
     if (!this.queryRunner) throw new Error('Transaction not started');
     return new AddressInternalRepositoryImpl(
       this.queryRunner.manager.getRepository(AddressInternal_ORM_Entity),
+    );
+  }
+
+  get approvalRepo(): IApprovalInternalRepository {
+    if (!this.queryRunner) throw new Error('Transaction not started');
+    return new ApprovalInternalRepositoryImpl(
+      this.queryRunner.manager.getRepository(ApprovalInternal_ORM_Entity),
     );
   }
 

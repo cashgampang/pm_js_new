@@ -76,8 +76,6 @@ class RelativeInternalDto {
 }
 
 export class CreateDraftLoanApplicationDto {
-  @IsNumber() @IsNotEmpty() marketing_id: number;
-
   @ValidateNested()
   @Type(() => ClientInternalDto)
   client_internal: ClientInternalDto;

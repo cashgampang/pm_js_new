@@ -6,6 +6,7 @@ export class UserForAuth {
     public readonly email: string,
     public readonly passwordHash: string,
     public readonly usertype: string,
+    public readonly type: string,
     public readonly isActive: USERSTATUS,
   ) {}
 
@@ -14,6 +15,7 @@ export class UserForAuth {
       id: this.id,
       email: this.email,
       usertype: this.usertype,
+      type: this.type,
       is_active: this.isActive,
     };
   }
