@@ -1,0 +1,30 @@
+name: CI/CD with Jest
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20' # Sesuaikan dengan versi Node.js yang Anda gunakan
+
+      - name: Install dependencies
+        run: yarn install # Atau npm install jika Anda menggunakan npm
+
+      - name: Run Jest tests
+        run: yarn test # Atau npm test

@@ -1,0 +1,20 @@
+import { USERSTATUS } from "src/Shared/Enums/Users/Users.enum";
+
+export class UserForAuth {
+  constructor(
+    public readonly id: number,
+    public readonly email: string,
+    public readonly passwordHash: string,
+    public readonly usertype: string,
+    public readonly isActive: USERSTATUS,
+  ) {}
+
+  toJSON() {
+    return {
+      id: this.id,
+      email: this.email,
+      usertype: this.usertype,
+      is_active: this.isActive,
+    };
+  }
+}
