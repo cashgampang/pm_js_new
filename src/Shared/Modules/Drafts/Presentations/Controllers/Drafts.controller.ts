@@ -16,7 +16,7 @@ import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/G
 import { RolesGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/roles.guard';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('loan-app-internal/drafts')
+@Controller('drafts')
 export class CreateDraftLoanApplicationController {
   constructor(
     private readonly createDraftLoanAppUseCase: CreateDraftLoanApplicationUseCase,

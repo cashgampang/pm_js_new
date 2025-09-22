@@ -39,6 +39,9 @@ import { FamilyInternalModule } from 'src/Modules/LoanAppInternal/Modules/family
 import { LoanApplicationInternalModule } from 'src/Modules/LoanAppInternal/Modules/loanApp-internal.module';
 import { RelativeInternalModule } from 'src/Modules/LoanAppInternal/Modules/relative-internal.module';
 import { DataSource } from 'typeorm';
+import { MKT_CreateDraftLoanApplicationController } from './Infrastructure/Controllers/MKT_CreateDraftLoanApp.controller';
+import { MKT_CreateDraftLoanApplicationUseCase } from './Applications/Services/MKT_CreateDraftLoanApp.usecase';
+import { DraftLoanApplicationModule } from 'src/Shared/Modules/Drafts/Modules/CreateLoanAppInt.module';
 
 
 
@@ -61,9 +64,13 @@ import { DataSource } from 'typeorm';
       CollateralInternal_ORM_Entity,
       RelativeInternal_ORM_Entity,
     ]),
+
+    //? untuk API Drafts agar bisa diinject ke roles:
+    DraftLoanApplicationModule
   ],
   controllers: [
     // controllers
+    MKT_CreateDraftLoanApplicationController,
     MKT_CreateLoanApplicationController,
     MKT_GetAllLoanApplicationController
   ],
@@ -71,6 +78,7 @@ import { DataSource } from 'typeorm';
     // usecases
     MKT_CreateLoanApplicationUseCase,
     MKT_GetAllLoanApplicationUseCase,
+    MKT_CreateDraftLoanApplicationUseCase,
 
     // infra
     {

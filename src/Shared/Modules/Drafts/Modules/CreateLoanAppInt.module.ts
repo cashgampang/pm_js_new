@@ -21,6 +21,6 @@ import { CreateDraftLoanApplicationUseCase } from '../Applications/Services/Loan
     CreateDraftLoanApplicationUseCase,
   ],
   controllers: [CreateDraftLoanApplicationController],
-  exports: [CreateDraftLoanApplicationUseCase],
+  exports: [CreateDraftLoanApplicationUseCase, CREATE_DRAFT_LOAN_APPLICATION_REPOSITORY],
 })
 export class DraftLoanApplicationModule {}

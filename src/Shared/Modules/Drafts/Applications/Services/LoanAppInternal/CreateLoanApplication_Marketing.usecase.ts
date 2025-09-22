@@ -1,6 +1,10 @@
 import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
-import { CREATE_DRAFT_LOAN_APPLICATION_REPOSITORY, ILoanApplicationDraftRepository } from '../../../Domain/Repositories/LoanAppInt.repository';
+import {
+  CREATE_DRAFT_LOAN_APPLICATION_REPOSITORY,
+  ILoanApplicationDraftRepository,
+} from '../../../Domain/Repositories/LoanAppInt.repository';
 import { CreateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
+import { LoanApplicationEntity } from '../../../Domain/Entities/LoanAppInt.entity';
 
 @Injectable()
 export class CreateDraftLoanApplicationUseCase {
@@ -9,18 +13,20 @@ export class CreateDraftLoanApplicationUseCase {
     private readonly loanAppDraftRepo: ILoanApplicationDraftRepository,
   ) {}
 
-  async executeCreateDraft
-  (marketingId: number, dto: CreateDraftLoanApplicationDto) {
+  async executeCreateDraft(
+    marketingId: number,
+    dto: CreateDraftLoanApplicationDto,
+  ) {
     try {
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,
-        client_internal: dto.client_internal,
-        address_internal: dto.address_internal,
-        family_internal: dto.family_internal,
-        job_internal: dto.job_internal,
-        loan_application_internal: dto.loan_application_internal,
-        collateral_internal: dto.collateral_internal,
-        relative_internal: dto.relative_internal,
+        client_internal: dto.payload.client_internal,
+        address_internal: dto.payload.address_internal,
+        family_internal: dto.payload.family_internal,
+        job_internal: dto.payload.job_internal,
+        loan_application_internal: dto.payload.loan_application_internal,
+        collateral_internal: dto.payload.collateral_internal,
+        relative_internal: dto.payload.relative_internal,
       });
 
       return {
@@ -67,7 +73,8 @@ export class CreateDraftLoanApplicationUseCase {
 
   async renderDraftByMarketingId(marketingId: number) {
     try {
-      const loanApps = await this.loanAppDraftRepo.findByMarketingId(marketingId);
+      const loanApps =
+        await this.loanAppDraftRepo.findByMarketingId(marketingId);
       if (loanApps.length === 0) {
         return {
           error: true,
@@ -81,7 +88,7 @@ export class CreateDraftLoanApplicationUseCase {
         message: 'Draft loan applications retrieved',
         reference: 'LOAN_RETRIEVE_OK',
         data: loanApps,
-      }
+      };
     } catch (error) {
       return {
         error: true,
@@ -108,9 +115,21 @@ export class CreateDraftLoanApplicationUseCase {
     }
   }
 
-  async updateDraftById(Id: string, updateData: Partial<CreateDraftLoanApplicationDto>) {
+  async updateDraftById(
+    Id: string,
+    updateData: Partial<CreateDraftLoanApplicationDto>,
+  ) {
+
+    const { payload } = updateData;
+    const entityUpdate: Partial<LoanApplicationEntity> = {
+      ...payload, //spread it
+    };
+
     try {
-      const loanApp = await this.loanAppDraftRepo.updateDraftById(Id, updateData);
+      const loanApp = await this.loanAppDraftRepo.updateDraftById(
+        Id,
+        entityUpdate,
+      );
       return {
         error: false,
         message: 'Draft loan applications updated',

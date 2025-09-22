@@ -8,7 +8,7 @@ import { Roles } from 'src/Shared/Modules/Authentication/Infrastructure/Decorato
 import { USERTYPE } from 'src/Shared/Enums/Users/Users.enum';
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 
-@Controller('marketing/int/loan-applications')
+@Controller('mkt/int/loan-applications')
 export class MKT_GetAllLoanApplicationController {
   constructor(
     @Inject(MKT_GetAllLoanApplicationUseCase)

@@ -16,6 +16,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MarketingInternalUseCaseModule } from './Modules/Users/Roles/Marketing-Internal/marketing-internal.module';
 import { SupervisorInternalUseCaseModule } from './Modules/Users/Roles/Supervisor-Internal/supervisor-internal.module';
 import { PersistenceLoanAppModule } from './Modules/LoanAppInternal/PersistenceLoanAppModule.module';
+import { CreditAnalystInternalUseCaseModule } from './Modules/Users/Roles/CreditAnalyst-Internal/credit-analyst-internal.module';
 
 @Module({
   imports: [
@@ -51,9 +52,10 @@ import { PersistenceLoanAppModule } from './Modules/LoanAppInternal/PersistenceL
     DraftsModule,
     NotificationsModule,
     
-    //? --- Use Cases ---
+    //? --- All Use Cases ---
     MarketingInternalUseCaseModule,
     SupervisorInternalUseCaseModule,
+    CreditAnalystInternalUseCaseModule,
 
     //? --- Persistence Config Modules ---
     PersistenceLoanAppModule,

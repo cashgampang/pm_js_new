@@ -43,31 +43,29 @@ export class AuthController {
     return this.registerUseCase.execute(dto);
   }
 
-  // Guest: Login -> pakai LocalAuthGuard
-
   // Guest: Login
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-    // req.user sudah valid, berisi user object
     const tokenDto = await this.LoginUseCase.execute(req.user);
     console.log(req.user);
     console.log(tokenDto);
 
-    res.cookie('access_token', tokenDto.accessToken, {
-      // domain: 'local',
-      // path: '/', // tambahkan ini!
-      httpOnly: true,
-      secure: false,
-      sameSite: 'none', // process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 1000 * 60 * 60,
-    });
+    // res.cookie('access_token', tokenDto.accessToken, {
+    //   domain: '.ngrok-free.app',
+    //   path: '/',
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: 'none', 
+    //   maxAge: 1000 * 60 * 60,
+    // });
 
     return {
       message: 'Login success',
       role: req.user.usertype,
       type: req.user.type,
+      access_token: tokenDto.accessToken,
       // role: req.user, role};
     };
 

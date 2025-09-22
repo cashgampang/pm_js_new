@@ -75,7 +75,7 @@ class RelativeInternalDto {
   @IsOptional() @IsString() no_hp?: string;
 }
 
-export class CreateDraftLoanApplicationDto {
+export class PayloadDTO {
   @ValidateNested()
   @Type(() => ClientInternalDto)
   client_internal: ClientInternalDto;
@@ -109,4 +109,10 @@ export class CreateDraftLoanApplicationDto {
   @ValidateNested()
   @Type(() => RelativeInternalDto)
   relative_internal?: RelativeInternalDto;
+}
+
+export class CreateDraftLoanApplicationDto {
+  @ValidateNested()
+  @Type(() => PayloadDTO)
+  payload: PayloadDTO;
 }

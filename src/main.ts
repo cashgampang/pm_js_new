@@ -7,26 +7,38 @@ import { AppModule } from './app.module';
 import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/jwtAuth.guard';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // somewhere in your initialization file
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
   app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));
-
-  app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:4173',
-      'http://app.local:3000',
-      'https://swb65h75-3000.asse.devtunnels.ms'
-    ],
-    credentials: true,
-  });
-
   app.use(cookieParser());
 
+  app.enableCors({
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:4173',
+        'http://app.local:3000',
+        'https://55ef93518683.ngrok-free.app',
+      ];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+  });
+
   app.use((req, res, next) => {
-    console.log('Incoming request:', req.method, req.url);
+    console.log('Request Origin:', req.headers.origin);
+    console.log('Response Headers:', res.getHeaders());
     next();
   });
 
@@ -39,8 +51,20 @@ async function bootstrap() {
     }),
   );
 
+  // Swagger Configuration
+  const config = new DocumentBuilder()
+    .setTitle('Your API')
+    .setDescription('API description')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
-  console.log('Server Successfully Started');
+  console.log(
+    `Server Successfully Started at http://localhost:${process.env.PORT}`,
+  );
 }
 
 bootstrap().catch((err) => {
