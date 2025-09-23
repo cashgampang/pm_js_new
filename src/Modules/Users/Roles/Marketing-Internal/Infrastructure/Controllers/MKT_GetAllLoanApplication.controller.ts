@@ -17,7 +17,7 @@ export class MKT_GetAllLoanApplicationController {
 
   // @Public()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USERTYPE.SUPERADMIN, USERTYPE.ADMIN)
+  @Roles(USERTYPE.MARKETING)
   @Get()
   async getAllLoanApplications(
     @CurrentUser('id') marketingId: number,

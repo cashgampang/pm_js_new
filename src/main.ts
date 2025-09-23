@@ -23,7 +23,7 @@ async function bootstrap() {
         'http://localhost:5173',
         'http://localhost:4173',
         'http://app.local:3000',
-        'https://55ef93518683.ngrok-free.app',
+        'https://553820302a82.ngrok-free.app',
       ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, origin);
@@ -38,6 +38,7 @@ async function bootstrap() {
 
   app.use((req, res, next) => {
     console.log('Request Origin:', req.headers.origin);
+    console.log('Request Cookie:', req.headers);
     console.log('Response Headers:', res.getHeaders());
     next();
   });

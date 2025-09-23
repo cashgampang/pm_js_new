@@ -121,6 +121,7 @@ export class CA_ApproveOrRejectUseCase {
           id: savedApproval.id,
           status: savedApproval.status,
           keterangan: savedApproval.keterangan,
+          kesimpulan: savedApproval.kesimpulan,
           created: savedApproval.createdAt,
           updated: savedApproval.updatedAt,
         },

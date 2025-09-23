@@ -24,7 +24,7 @@ export class RolesGuard implements CanActivate {
 
     if (!user) {
       throw new UnauthorizedException(
-        'User belum login atau token tidak valid',
+        'Masalah dengan autentikasi, silahkan login kembali',
       );
     }
 
@@ -34,7 +34,7 @@ export class RolesGuard implements CanActivate {
 
     if (!hasRole) {
       throw new ForbiddenException(
-        `Akses ditolak, role kamu: [${user.usertype}], tapi butuh: [${requiredRoles.join(', ')}]`,
+        `Akses ditolak, Endpoint ini memerlukan: [${requiredRoles.join(', ')}]. Role anda: ${user.usertype}`,
       );
     }
 

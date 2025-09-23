@@ -4,6 +4,7 @@ import { USERTYPE } from 'src/Shared/Enums/Users/Users.enum';
 import { CA_ApproveOrRejectUseCase } from '../../Applications/Services/CA_ApprovedOrReject.usecase';
 import { ApprovalInternalStatusEnum } from 'src/Shared/Enums/Internal/Approval.enum';
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
+import { Roles } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/roles.decorator';
 
 @Controller('ca/int/loan-app')
 export class CA_ApprovedOrRejectController {
@@ -11,6 +12,7 @@ export class CA_ApprovedOrRejectController {
     private readonly approveOrRejectUseCase: CA_ApproveOrRejectUseCase,
   ) {}
 
+  @Roles(USERTYPE.CA)
   @Post('approve-or-reject/:id')
   async approveOrReject(
     @Req() req: Request,
@@ -19,6 +21,7 @@ export class CA_ApprovedOrRejectController {
     body: {
       status: ApprovalInternalStatusEnum;
       keterangan?: string;
+      kesimpulan?: string;
     },
     @CurrentUser('id') creditAnalystId: number,
   ) {
