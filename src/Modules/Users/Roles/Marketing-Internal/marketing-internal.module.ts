@@ -21,6 +21,9 @@ import { LocalFileStorageService } from 'src/Shared/Modules/Storage/Infrastructu
 // Usecases
 import { MKT_CreateLoanApplicationUseCase } from './Applications/Services/MKT_CreateLoanApplication.usecase';
 import { MKT_GetAllLoanApplicationUseCase } from './Applications/Services/MKT_GetAllLoanApplication.usecase';
+import { MKT_GetLoanApplicationByIdUseCase } from './Applications/Services/MKT_GetLoanApplicationById.usecase';
+import { MKT_CreateDraftLoanApplicationUseCase } from './Applications/Services/MKT_CreateDraftLoanApp.usecase';
+import { MKT_UpdateLoanApplicationUseCase } from './Applications/Services/MKT_UpdateLoanApplication.usecase';
 // import { MKT_GetAllLoanApplicationUseCase } from './usecases/MKT_GetAllLoanApplication.usecase';
 // import { MKT_GetLoanApplicationByIdUseCase } from './usecases/MKT_GetLoanApplicationById.usecase';
 // import { MKT_UpdateLoanApplicationByIdUseCase } from './usecases/MKT_UpdateLoanApplication.usecase';
@@ -29,6 +32,9 @@ import { MKT_GetAllLoanApplicationUseCase } from './Applications/Services/MKT_Ge
 // Controllers
 import { MKT_CreateLoanApplicationController } from './Infrastructure/Controllers/MKT_CreateLoanApplication.controller';
 import { MKT_GetAllLoanApplicationController } from './Infrastructure/Controllers/MKT_GetAllLoanApplication.controller';
+import { MKT_UpdateLoanApplicationController } from './Infrastructure/Controllers/MKT_UpdateLoanApplication.controller';
+import { MKT_GetLoanApplicationByIdController } from './Infrastructure/Controllers/MKT_GetLoanApplicationById.controller';
+import { MKT_CreateDraftLoanApplicationController } from './Infrastructure/Controllers/MKT_CreateDraftLoanApp.controller';
 
 import { AddressInternalModule } from 'src/Modules/LoanAppInternal/Modules/address-internal.module';
 import { ApprovalInternalModule } from 'src/Modules/LoanAppInternal/Modules/approval-internal.module';
@@ -39,8 +45,6 @@ import { FamilyInternalModule } from 'src/Modules/LoanAppInternal/Modules/family
 import { LoanApplicationInternalModule } from 'src/Modules/LoanAppInternal/Modules/loanApp-internal.module';
 import { RelativeInternalModule } from 'src/Modules/LoanAppInternal/Modules/relative-internal.module';
 import { DataSource } from 'typeorm';
-import { MKT_CreateDraftLoanApplicationController } from './Infrastructure/Controllers/MKT_CreateDraftLoanApp.controller';
-import { MKT_CreateDraftLoanApplicationUseCase } from './Applications/Services/MKT_CreateDraftLoanApp.usecase';
 import { DraftLoanApplicationModule } from 'src/Shared/Modules/Drafts/Modules/CreateLoanAppInt.module';
 
 
@@ -72,13 +76,17 @@ import { DraftLoanApplicationModule } from 'src/Shared/Modules/Drafts/Modules/Cr
     // controllers
     MKT_CreateDraftLoanApplicationController,
     MKT_CreateLoanApplicationController,
-    MKT_GetAllLoanApplicationController
+    MKT_GetAllLoanApplicationController,
+    MKT_GetLoanApplicationByIdController,
+    MKT_UpdateLoanApplicationController,
   ],
   providers: [
     // usecases
+    MKT_CreateDraftLoanApplicationUseCase,
     MKT_CreateLoanApplicationUseCase,
     MKT_GetAllLoanApplicationUseCase,
-    MKT_CreateDraftLoanApplicationUseCase,
+    MKT_GetLoanApplicationByIdUseCase,
+    MKT_UpdateLoanApplicationUseCase,
 
     // infra
     {

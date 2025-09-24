@@ -4,15 +4,15 @@ export class ClientInternal {
   // === Immutable ===
   public readonly id?: number;
   public readonly marketingId: number;
-  public readonly namaLengkap: string;
-  public readonly noKtp: string;
-  public readonly jenisKelamin: GENDER;
-  public readonly tempatLahir: string;
-  public readonly tanggalLahir: Date;
   public readonly createdAt: Date;
   public readonly deletedAt?: Date | null;
-
+  
   // === Mutable ===
+  public namaLengkap: string;
+  public noKtp: string;
+  public jenisKelamin: GENDER;
+  public tempatLahir: string;
+  public tanggalLahir: Date;
   public noHp: string;
   public statusNikah: MARRIAGE_STATUS;
   public email?: string;

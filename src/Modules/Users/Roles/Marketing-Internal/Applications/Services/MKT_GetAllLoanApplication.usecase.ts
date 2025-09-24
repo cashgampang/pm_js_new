@@ -19,11 +19,12 @@ export class MKT_GetAllLoanApplicationUseCase {
     searchQuery = '',
   ) {
     try {
-      const { data, total } = await this.loanAppRepo.callSP_MKT_GetAllLoanApplications_Internal(
-        marketingId,
-        page,
-        pageSize,
-      );
+      const { data, total } =
+        await this.loanAppRepo.callSP_MKT_GetAllLoanApplications_Internal(
+          marketingId,
+          page,
+          pageSize,
+        );
 
       // Jika ada searchQuery, filter hasilnya
       const filteredData = searchQuery
@@ -32,7 +33,16 @@ export class MKT_GetAllLoanApplicationUseCase {
           )
         : data;
 
-      return { data: filteredData, total }; // Total tetep pake nilai asli dari SP
+      const formattedData = filteredData.map((item) => ({
+        clientId: Number(item.clientId),
+        loanAppId: Number(item.loanAppId),
+        nominal_pinjaman: Number(item.nominal_pinjaman),
+        tenor: Number(item.tenor),
+        nama_lengkap: item.nama_lengkap,
+        status: item.status,
+      }));
+
+      return { data: formattedData, total }; // Total tetep pake nilai asli dari SP
     } catch (err) {
       throw new Error(err.message || 'Gagal mengambil data pengajuan');
     }

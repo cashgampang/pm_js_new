@@ -30,20 +30,24 @@ export class MKT_CreateDraftLoanApplicationUseCase {
       });
 
       return {
-        error: false,
-        message: 'Draft loan application created',
-        reference: 'LOAN_CREATE_OK',
-        data: loanApp,
+        payload: {
+          error: false,
+          message: 'Draft loan application created',
+          reference: 'LOAN_CREATE_OK',
+          data: loanApp,
+        },
       };
     } catch (err) {
       if (err.name === 'ValidationError') {
         throw new HttpException(
           {
-            error: true,
-            message: Object.values(err.errors)
-              .map((e: any) => e.message)
-              .join(', '),
-            reference: 'LOAN_VALIDATION_ERROR',
+            payload: {
+              error: 'BAD REQUEST',
+              message: Object.values(err.errors)
+                .map((e: any) => e.message)
+                .join(', '),
+              reference: 'LOAN_VALIDATION_ERROR',
+            },
           },
           HttpStatus.BAD_REQUEST, // ⬅️ 400 bukan 201
         );
@@ -52,7 +56,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
       if (err.code === 11000) {
         throw new HttpException(
           {
-            error: true,
+            error: 'DUPLICATE KEY',
             message: `Duplicate field: ${Object.keys(err.keyValue).join(', ')}`,
             reference: 'LOAN_DUPLICATE_KEY',
           },
@@ -62,9 +66,11 @@ export class MKT_CreateDraftLoanApplicationUseCase {
 
       throw new HttpException(
         {
-          error: true,
-          message: err.message || 'Unexpected error',
-          reference: 'LOAN_UNKNOWN_ERROR',
+          payload: {
+            error: 'UNEXPECTED ERROR',
+            message: 'Unexpected error',
+            reference: 'LOAN_UNKNOWN_ERROR',
+          },
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -75,43 +81,67 @@ export class MKT_CreateDraftLoanApplicationUseCase {
     try {
       const loanApps =
         await this.loanAppDraftRepo.findByMarketingId(marketingId);
+
       if (loanApps.length === 0) {
-        return {
-          error: true,
-          message: 'No draft loan applications found for this marketing ID',
-          reference: 'LOAN_NOT_FOUND',
-          data: [],
-        };
+        throw new HttpException(
+          {
+            payload: {
+              error: true,
+              message: 'No draft loan applications found for this marketing ID',
+              reference: 'LOAN_NOT_FOUND',
+            },
+          },
+          HttpStatus.NOT_FOUND,
+        );
       }
       return {
-        error: false,
-        message: 'Draft loan applications retrieved',
-        reference: 'LOAN_RETRIEVE_OK',
-        data: loanApps,
+        payload: {
+          error: false,
+          message: 'Draft loan applications retrieved',
+          reference: 'LOAN_RETRIEVE_OK',
+          data: [...loanApps],
+        },
       };
     } catch (error) {
-      return {
-        error: true,
-        message: error.message || 'Unexpected error',
-        reference: 'LOAN_UNKNOWN_ERROR',
-      };
+      console.log(error)
+      throw new HttpException(
+        {
+          payload: {
+            error: 'Unexpected error',
+            message: 'Unexpected error',
+            reference: 'LOAN_UNKNOWN_ERROR',
+          },
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async deleteDraftByMarketingId(Id: string) {
     try {
       await this.loanAppDraftRepo.softDelete(Id);
-      return {
-        error: false,
-        message: 'Draft loan applications deleted',
-        reference: 'LOAN_DELETE_OK',
-      };
+      throw new HttpException(
+        {
+          payload: {
+            error: false,
+            message: 'Draft loan applications deleted',
+            reference: 'LOAN_DELETE_OK',
+            data: [],
+          },
+        },
+        HttpStatus.NO_CONTENT,
+      );
     } catch (error) {
-      return {
-        error: true,
-        message: error.message || 'Unexpected error',
-        reference: 'LOAN_UNKNOWN_ERROR',
-      };
+      throw new HttpException(
+        {
+          payload: {
+            error: 'Unexpected error',
+            message: 'Unexpected error',
+            reference: 'LOAN_UNKNOWN_ERROR',
+          },
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -129,18 +159,28 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         Id,
         entityUpdate,
       );
-      return {
-        error: false,
-        message: 'Draft loan applications updated',
-        reference: 'LOAN_UPDATE_OK',
-        data: loanApp,
-      };
+      throw new HttpException(
+        {
+          payload: {
+            error: false,
+            message: 'Draft loan applications updated',
+            reference: 'LOAN_UPDATE_OK',
+            data: loanApp,
+          },
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
-      return {
-        error: true,
-        message: error.message || 'Unexpected error',
-        reference: 'LOAN_UNKNOWN_ERROR',
-      };
+      throw new HttpException(
+        {
+          payload: {
+            error: 'Unexpected error',
+            message: error.message || 'Unexpected error',
+            reference: 'LOAN_UNKNOWN_ERROR',
+          },
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

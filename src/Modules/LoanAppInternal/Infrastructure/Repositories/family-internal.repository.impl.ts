@@ -63,7 +63,6 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
   ): Partial<FamilyInternal_ORM_Entity> {
     const ormData: Partial<FamilyInternal_ORM_Entity> = {};
 
-
     if (partial.nasabahId)
       ormData.nasabah_id! = {
         id: partial.nasabahId,
@@ -71,7 +70,8 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
     if (partial.hubungan) ormData.hubungan = partial.hubungan;
     if (partial.nama) ormData.nama = partial.nama;
     if (partial.bekerja) ormData.bekerja = partial.bekerja;
-    if (partial.namaPerusahaan) ormData.nama_perusahaan = partial.namaPerusahaan;
+    if (partial.namaPerusahaan)
+      ormData.nama_perusahaan = partial.namaPerusahaan;
     if (partial.jabatan) ormData.jabatan = partial.jabatan;
     if (partial.penghasilan) ormData.penghasilan = partial.penghasilan;
     if (partial.alamatKerja) ormData.alamat_kerja = partial.alamatKerja;
@@ -108,7 +108,10 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
     addressData: Partial<FamilyInternal>,
   ): Promise<FamilyInternal> {
     await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
+
+    const updated = await this.ormRepository.findOne({ 
+      where: { id },
+    });
     if (!updated) throw new Error('Address not found');
     return this.toDomain(updated);
   }

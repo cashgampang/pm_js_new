@@ -15,7 +15,7 @@ import {
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 import { Public } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/public.decorator';
 
-@Controller('mkt/int/loan-application')
+@Controller('mkt/int/loan-apps')
 export class MKT_CreateLoanApplicationController {
   constructor(
     private readonly createLoanApplication: MKT_CreateLoanApplicationUseCase,

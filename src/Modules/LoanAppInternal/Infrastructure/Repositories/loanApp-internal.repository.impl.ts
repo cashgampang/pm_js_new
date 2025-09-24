@@ -5,6 +5,7 @@ import { LoanApplicationInternal } from '../../Domain/Entities/loan-application-
 import { ILoanApplicationInternalRepository } from '../../Domain/Repositories/loanApp-internal.repository';
 import { LoanApplicationInternal_ORM_Entity } from '../Entities/loan-application-internal.orm-entity';
 import { ClientInternal_ORM_Entity } from '../Entities/client-internal.orm-entity';
+import { TypeApprovalDetail, TypeLoanApplicationDetail } from 'src/Modules/Users/Roles/Marketing-Internal/Applications/DTOS/MKT_CreateLoanApplication.dto';
 @Injectable()
 export class LoanApplicationInternalRepositoryImpl
   implements ILoanApplicationInternalRepository
@@ -119,20 +120,20 @@ export class LoanApplicationInternalRepositoryImpl
   }
 
   async save(
-    address: LoanApplicationInternal,
+    loanApp: LoanApplicationInternal,
   ): Promise<LoanApplicationInternal> {
-    const ormEntity = this.toOrm(address);
+    const ormEntity = this.toOrm(loanApp);
     const savedOrm = await this.ormRepository.save(ormEntity);
     return this.toDomain(savedOrm);
   }
 
   async update(
     id: number,
-    addressData: Partial<LoanApplicationInternal>,
+    loanAppData: Partial<LoanApplicationInternal>,
   ): Promise<LoanApplicationInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
+    await this.ormRepository.update(id, this.toOrmPartial(loanAppData));
     const updated = await this.ormRepository.findOne({ where: { id } });
-    if (!updated) throw new Error('Address not found');
+    if (!updated) throw new Error('Loan Application not found');
     return this.toDomain(updated);
   }
 
@@ -160,5 +161,13 @@ export class LoanApplicationInternalRepositoryImpl
       data: result[0] || [],
       total: result[1] ? result[1][0]?.total || 0 : 0,
     };
+  }
+
+  async callSP_MKT_GetDetail_LoanApplicationsInternal_ById(loanAppId: number): Promise<[TypeLoanApplicationDetail[], TypeApprovalDetail[]]> {
+    const results: [TypeLoanApplicationDetail[], TypeApprovalDetail[]] = await this.ormRepository.manager.query(
+      `CALL MKT_GetLoanApplicationById_Internal(?)`, [loanAppId]
+    );
+
+    return results;
   }
 }

@@ -70,7 +70,6 @@ export class MKT_CreateLoanApplicationUseCase {
     @Inject(FILE_STORAGE_SERVICE)
     private readonly fileStorage: IFileStorageService,
 
-
     @Inject(UNIT_OF_WORK)
     private readonly uow: IUnitOfWork, // handle transaction + rollback
   ) {}
@@ -215,9 +214,15 @@ export class MKT_CreateLoanApplicationUseCase {
         }
 
         return {
-          message: 'Pengajuan berhasil dibuat',
-          loanAppId: loanApp.id,
-          filePaths,
+          payload: {
+            error: false,
+            message: 'Pengajuan berhasil dibuat',
+            reference: 'LOAN_CREATE_OK',
+            data: {
+              loanAppId: loanApp.id,
+              filePaths,
+            },
+          },
         };
       });
     } catch (err) {
