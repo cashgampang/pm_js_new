@@ -105,14 +105,14 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
 
   async update(
     id: number,
-    addressData: Partial<FamilyInternal>,
+    familyData: Partial<FamilyInternal>,
   ): Promise<FamilyInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
+    await this.ormRepository.update(id, this.toOrmPartial(familyData));
 
-    const updated = await this.ormRepository.findOne({ 
-      where: { id },
+    const updated = await this.ormRepository.findOne({
+      where: { id},
     });
-    if (!updated) throw new Error('Address not found');
+    if (!updated) throw new Error('Family not found');
     return this.toDomain(updated);
   }
 

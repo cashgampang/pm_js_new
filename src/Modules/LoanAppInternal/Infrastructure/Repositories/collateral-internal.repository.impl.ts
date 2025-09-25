@@ -137,11 +137,14 @@ export class CollateralInternalRepositoryImpl
 
   async update(
     id: number,
-    addressData: Partial<CollateralInternal>,
+    collateralData: Partial<CollateralInternal>,
   ): Promise<CollateralInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
-    if (!updated) throw new Error('Address not found');
+    console.log('collateralData', collateralData, 'id', id);
+    await this.ormRepository.update(id, this.toOrmPartial(collateralData));
+    const updated = await this.ormRepository.findOne({
+      where: { id },
+    });
+    if (!updated) throw new Error('Collateral not found');
     return this.toDomain(updated);
   }
 

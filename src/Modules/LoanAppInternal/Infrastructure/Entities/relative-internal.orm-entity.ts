@@ -11,7 +11,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-@Entity('relatives_internal')
+@Entity('relative_internal')
 export class RelativeInternal_ORM_Entity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;

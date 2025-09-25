@@ -27,7 +27,7 @@ import {
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/collateral-internal.repository';
 
 import {
-  IRelativeInternalRepository,
+  IRelativesInternalRepository,
   RELATIVE_INTERNAL_REPOSITORY,
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/relatives-internal.repository';
 
@@ -59,7 +59,7 @@ export class MKT_UpdateLoanApplicationUseCase {
     @Inject(COLLATERAL_INTERNAL_REPOSITORY)
     private readonly collateralRepo: ICollateralInternalRepository,
     @Inject(RELATIVE_INTERNAL_REPOSITORY)
-    private readonly relativeRepo: IRelativeInternalRepository,
+    private readonly relativeRepo: IRelativesInternalRepository,
     @Inject(FILE_STORAGE_SERVICE)
     private readonly fileStorage: IFileStorageService,
 
@@ -78,12 +78,14 @@ export class MKT_UpdateLoanApplicationUseCase {
           job_internal,
           loan_application_internal,
           collateral_internal,
-          relative_internal,
+          relatives_internal,
         } = dto;
 
         // 1. Ambil Client
         const customer = await this.clientRepo.findById(clientId);
         if (!customer) throw new BadRequestException('Client tidak ditemukan');
+        console.log(customer)
+        console.log('oi id oi', customer.id)
 
         // 2. Upload file kalau ada
         const filePaths = files
@@ -195,12 +197,12 @@ export class MKT_UpdateLoanApplicationUseCase {
         }
 
         // 9. Partial update Relative
-        if (relative_internal) {
+        if (relatives_internal) {
           await this.relativeRepo.update(customer.id!, {
-            kerabatKerja: relative_internal.kerabat_kerja,
-            nama: relative_internal.nama,
-            alamat: relative_internal.alamat,
-            noHp: relative_internal.no_hp,
+            kerabatKerja: relatives_internal.kerabat_kerja,
+            nama: relatives_internal.nama,
+            alamat: relatives_internal.alamat,
+            noHp: relatives_internal.no_hp,
           });
         }
 

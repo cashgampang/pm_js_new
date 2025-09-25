@@ -5,7 +5,10 @@ import { LoanApplicationInternal } from '../../Domain/Entities/loan-application-
 import { ILoanApplicationInternalRepository } from '../../Domain/Repositories/loanApp-internal.repository';
 import { LoanApplicationInternal_ORM_Entity } from '../Entities/loan-application-internal.orm-entity';
 import { ClientInternal_ORM_Entity } from '../Entities/client-internal.orm-entity';
-import { TypeApprovalDetail, TypeLoanApplicationDetail } from 'src/Modules/Users/Roles/Marketing-Internal/Applications/DTOS/MKT_CreateLoanApplication.dto';
+import {
+  TypeApprovalDetail,
+  TypeLoanApplicationDetail,
+} from 'src/Modules/Users/Roles/Marketing-Internal/Applications/DTOS/MKT_CreateLoanApplication.dto';
 @Injectable()
 export class LoanApplicationInternalRepositoryImpl
   implements ILoanApplicationInternalRepository
@@ -107,7 +110,6 @@ export class LoanApplicationInternalRepositoryImpl
   async findById(id: number): Promise<LoanApplicationInternal | null> {
     const ormEntity = await this.ormRepository.findOne({
       where: { id },
-      relations: ['nasabah_id'], 
     });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
@@ -132,7 +134,9 @@ export class LoanApplicationInternalRepositoryImpl
     loanAppData: Partial<LoanApplicationInternal>,
   ): Promise<LoanApplicationInternal> {
     await this.ormRepository.update(id, this.toOrmPartial(loanAppData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
+    const updated = await this.ormRepository.findOne({
+      where: { id },
+    });
     if (!updated) throw new Error('Loan Application not found');
     return this.toDomain(updated);
   }
@@ -163,11 +167,65 @@ export class LoanApplicationInternalRepositoryImpl
     };
   }
 
-  async callSP_MKT_GetDetail_LoanApplicationsInternal_ById(loanAppId: number): Promise<[TypeLoanApplicationDetail[], TypeApprovalDetail[]]> {
-    const results: [TypeLoanApplicationDetail[], TypeApprovalDetail[]] = await this.ormRepository.manager.query(
-      `CALL MKT_GetLoanApplicationById_Internal(?)`, [loanAppId]
-    );
+  async callSP_MKT_GetDetail_LoanApplicationsInternal_ById(
+    loanAppId: number,
+  ): Promise<[TypeLoanApplicationDetail[], TypeApprovalDetail[]]> {
+    const results: [TypeLoanApplicationDetail[], TypeApprovalDetail[]] =
+      await this.ormRepository.manager.query(
+        `CALL MKT_GetLoanApplicationById_Internal(?)`,
+        [loanAppId],
+      );
 
     return results;
+  }
+
+  async callSP_SPV_GetAllApprovalHistory_ByTeam(
+    supervisorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const ormEntities = this.ormRepository.manager;
+    const result = await ormEntities.query(
+      `CALL SPV_GetApprovalHistoryByTeams_Internal(?, ?, ?);`,
+      [supervisorId, page, pageSize],
+    );
+
+    return {
+      data: result[1] || [],
+      total: result[0] ? result[1][0]?.total || 0 : 0,
+    };
+  }
+
+  async callSP_SPV_GetAllApprovalRequest_Internal(
+    supervisorId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const ormEntities = this.ormRepository.manager;
+    const result = await ormEntities.query(
+      `CALL SPV_GetAllApprovalRequest_Internal(?, ?, ?);`,
+      [supervisorId, page, pageSize],
+    );
+
+    return {
+      data: result[1] || [],
+      total: result[0] ? result[1][0]?.total || 0 : 0,
+    };
+  }
+
+  async callSP_CA_GetAllApprovalHistory(
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const ormEntities = this.ormRepository.manager;
+    const result = await ormEntities.query(
+      `CALL CA_GetApprovalHistory_Internal(?, ?, ?);`,
+      [page, pageSize],
+    );
+
+    return {
+      data: result[1] || [],
+      total: result[0] ? result[1][0]?.total || 0 : 0,
+    };
   }
 }

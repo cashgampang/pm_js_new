@@ -23,7 +23,6 @@ async function bootstrap() {
         'http://localhost:5173',
         'http://localhost:4173',
         'http://app.local:3000',
-        'https://553820302a82.ngrok-free.app',
       ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, origin);
@@ -54,7 +53,7 @@ async function bootstrap() {
 
   // Swagger Configuration
   const config = new DocumentBuilder()
-    .setTitle('Your API')
+    .setTitle('Pengajuan Marketing API')
     .setDescription('API description')
     .setVersion('1.0')
     .build();

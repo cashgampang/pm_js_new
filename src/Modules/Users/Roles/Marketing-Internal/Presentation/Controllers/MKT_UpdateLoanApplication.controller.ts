@@ -49,6 +49,7 @@ export class MKT_UpdateLoanApplicationController {
   ) {
     console.log('Request body:', dto);
     console.log('Uploaded files:', files);
+    console.log('Client ID:', clientId);
 
     try {
       // parse payload kalau masih string

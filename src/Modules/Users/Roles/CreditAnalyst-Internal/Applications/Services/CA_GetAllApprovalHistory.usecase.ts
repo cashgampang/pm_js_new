@@ -6,7 +6,7 @@ import {
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/loanApp-internal.repository';
 
 @Injectable()
-export class SPV_GetAllApproval_ByTeam_UseCase {
+export class CA_GetAllApprovalHistory_UseCase {
   constructor(
     @Inject(LOAN_APPLICATION_INTERNAL_REPOSITORY)
     private readonly loanAppRepo: ILoanApplicationInternalRepository,
@@ -28,8 +28,7 @@ export class SPV_GetAllApproval_ByTeam_UseCase {
         pageSize,
       );
       const { data, total } =
-        await this.loanAppRepo.callSP_SPV_GetAllApprovalHistory_ByTeam(
-          supervisorId,
+        await this.loanAppRepo.callSP_CA_GetAllApprovalHistory(
           page,
           pageSize,
         );
@@ -48,11 +47,14 @@ export class SPV_GetAllApproval_ByTeam_UseCase {
       console.log('filteredData: ', filteredData);
 
       const formattedData = filteredData.map((item) => ({
-        id_nasabah: Number(item.nasabah_id),
-        nama_nasabah: item.nasabah_nama,
-        id_marketing: Number(item.user_id),
-        nama_marketing: item.marketing_nama,
-        status: item.loan_status,
+        nama_nasabah: item.nama_nasabah,
+        keperluan: item.keperluan,
+        nominal_pinjaman: Number(item.nominal_pinjaman),
+        nama_marketing: item.nama_marketing,
+        nama_supervisor: item.nama_supervisor,
+        status: item.ca_status,
+        keterangan: item.ca_keterangan,
+        kesimpulan: item.ca_kesimpulan,
       }));
 
       return { data: formattedData, total }; // Total tetep pake nilai asli dari SP

@@ -13,9 +13,13 @@ import { LoanApplicationInternal_ORM_Entity } from 'src/Modules/LoanAppInternal/
 
 //? USE CASE
 import { SPV_ApproveOrRejectUseCase } from './Applications/Services/SPV_ApprovedOrReject.usecase';
+import { SPV_GetAllApproval_ByTeam_UseCase } from './Applications/Services/SPV_GetApprovalHistoryByTeam.usecase';
+import { SPV_GetAllApprovalRequestByTeam_UseCase } from './Applications/Services/SPV_GetAllApprovalRequestByTeam.usecase';
 
 //? CONTROLLER
-import { SPV_ApprovedOrRejectController } from './Infrastructure/Controllers/SPV_CreateApprovedOrReject.controller';
+import { SPV_ApprovedOrRejectController } from './Presentation/Controllers/SPV_CreateApprovedOrReject.controller';
+import { SPV_GetAllApproval_ByTeam_Controller } from './Presentation/Controllers/SPV_GetApprovalHistoryByTeam.controller';
+import { SPV_GetAllApprovalRequest_ByTeam_Controller } from './Presentation/Controllers/SPV_GetAllApprovalRequestByTeam.controller';
 @Module({
   imports: [
     ApprovalInternalModule,
@@ -26,7 +30,7 @@ import { SPV_ApprovedOrRejectController } from './Infrastructure/Controllers/SPV
       LoanApplicationInternal_ORM_Entity,
     ]),
   ],
-  controllers: [SPV_ApprovedOrRejectController],
-  providers: [SPV_ApproveOrRejectUseCase],
+  controllers: [SPV_ApprovedOrRejectController, SPV_GetAllApproval_ByTeam_Controller, SPV_GetAllApprovalRequest_ByTeam_Controller],
+  providers: [SPV_ApproveOrRejectUseCase, SPV_GetAllApproval_ByTeam_UseCase, SPV_GetAllApprovalRequestByTeam_UseCase],
 })
 export class SupervisorInternalUseCaseModule {}

@@ -113,8 +113,11 @@ export class AddressInternalRepositoryImpl
     id: number,
     addressData: Partial<AddressInternal>,
   ): Promise<AddressInternal> {
+
     await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
+    const updated = await this.ormRepository.findOne({
+      where: { id },
+    });
     if (!updated) throw new Error('Address not found');
     return this.toDomain(updated);
   }

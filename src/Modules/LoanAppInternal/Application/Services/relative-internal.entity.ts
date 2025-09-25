@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IRelativeInternalRepository, RELATIVE_INTERNAL_REPOSITORY } from '../../Domain/Repositories/relatives-internal.repository';
-import { RelativeInternal } from '../../Domain/Entities/relative-internal.entity';
+import { IRelativesInternalRepository, RELATIVE_INTERNAL_REPOSITORY } from '../../Domain/Repositories/relatives-internal.repository';
+import { RelativesInternal } from '../../Domain/Entities/relative-internal.entity';
 import { CreateRelativeInternalDto } from '../DTOS/dto-Relatives/create-relatives-internal.dto';
 import { UpdateRelativeInternalDto } from '../DTOS/dto-Relatives/update-relatives-internal.dto';
 
@@ -8,12 +8,12 @@ import { UpdateRelativeInternalDto } from '../DTOS/dto-Relatives/update-relative
 export class RelativeInternalService {
   constructor(
     @Inject(RELATIVE_INTERNAL_REPOSITORY)
-    private readonly repo: IRelativeInternalRepository,
+    private readonly repo: IRelativesInternalRepository,
   ) {}
 
-  async create(dto: CreateRelativeInternalDto): Promise<RelativeInternal> {
+  async create(dto: CreateRelativeInternalDto): Promise<RelativesInternal> {
     const now = new Date();
-    const address = new RelativeInternal(
+    const address = new RelativesInternal(
       dto.nasabah_id,
       dto.kerabat_kerja,
       undefined,
@@ -29,15 +29,15 @@ export class RelativeInternalService {
     return this.repo.save(address);
   }
 
-  async update(id: number, dto: UpdateRelativeInternalDto): Promise<RelativeInternal> {
+  async update(id: number, dto: UpdateRelativeInternalDto): Promise<RelativesInternal> {
     return this.repo.update(id, dto);
   }
 
-  async findById(id: number): Promise<RelativeInternal | null> {
+  async findById(id: number): Promise<RelativesInternal | null> {
     return this.repo.findById(id);
   }
 
-  async findAll(): Promise<RelativeInternal[]> {
+  async findAll(): Promise<RelativesInternal[]> {
     return this.repo.findAll();
   }
 

@@ -11,6 +11,7 @@ export class LoginUseCase {
 
   async execute(user: {
     id: number;
+    nama: string;
     email: string;
     usertype: string;
     is_active: string;

@@ -5,7 +5,7 @@ import { FamilyInternal } from 'src/Modules/LoanAppInternal/Domain/Entities/fami
 import { JobInternal } from 'src/Modules/LoanAppInternal/Domain/Entities/job-internal.entity';
 import { LoanApplicationInternal } from 'src/Modules/LoanAppInternal/Domain/Entities/loan-application-internal.entity';
 import { CollateralInternal } from 'src/Modules/LoanAppInternal/Domain/Entities/collateral-internal.entity';
-import { RelativeInternal } from 'src/Modules/LoanAppInternal/Domain/Entities/relative-internal.entity';
+import { RelativesInternal } from 'src/Modules/LoanAppInternal/Domain/Entities/relative-internal.entity';
 
 // Repository Interfaces
 import {
@@ -34,7 +34,7 @@ import {
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/collateral-internal.repository';
 
 import {
-  IRelativeInternalRepository,
+  IRelativesInternalRepository,
   RELATIVE_INTERNAL_REPOSITORY,
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/relatives-internal.repository';
 
@@ -66,7 +66,7 @@ export class MKT_CreateLoanApplicationUseCase {
     @Inject(COLLATERAL_INTERNAL_REPOSITORY)
     private readonly collateralRepo: ICollateralInternalRepository,
     @Inject(RELATIVE_INTERNAL_REPOSITORY)
-    private readonly relativeRepo: IRelativeInternalRepository,
+    private readonly relativeRepo: IRelativesInternalRepository,
     @Inject(FILE_STORAGE_SERVICE)
     private readonly fileStorage: IFileStorageService,
 
@@ -203,7 +203,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 8. Relative (kalau memang mau dipakai ke tabel baru)
         if (relative_internal) {
           await this.relativeRepo.save(
-            new RelativeInternal(
+            new RelativesInternal(
               customer.id!,
               relative_internal.kerabat_kerja,
               relative_internal.nama,

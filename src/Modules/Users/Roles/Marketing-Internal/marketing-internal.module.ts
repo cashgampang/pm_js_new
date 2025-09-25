@@ -30,11 +30,11 @@ import { MKT_UpdateLoanApplicationUseCase } from './Applications/Services/MKT_Up
 // import { MKT_CreateDraftLoanAppUseCase } from './usecases/MKT_CreateDraftLoanApp.usecase';
 
 // Controllers
-import { MKT_CreateLoanApplicationController } from './Infrastructure/Controllers/MKT_CreateLoanApplication.controller';
-import { MKT_GetAllLoanApplicationController } from './Infrastructure/Controllers/MKT_GetAllLoanApplication.controller';
-import { MKT_UpdateLoanApplicationController } from './Infrastructure/Controllers/MKT_UpdateLoanApplication.controller';
-import { MKT_GetLoanApplicationByIdController } from './Infrastructure/Controllers/MKT_GetLoanApplicationById.controller';
-import { MKT_CreateDraftLoanApplicationController } from './Infrastructure/Controllers/MKT_CreateDraftLoanApp.controller';
+import { MKT_CreateLoanApplicationController } from './Presentation/Controllers/MKT_CreateLoanApplication.controller';
+import { MKT_GetAllLoanApplicationController } from './Presentation/Controllers/MKT_GetAllLoanApplication.controller';
+import { MKT_UpdateLoanApplicationController } from './Presentation/Controllers/MKT_UpdateLoanApplication.controller';
+import { MKT_GetLoanApplicationByIdController } from './Presentation/Controllers/MKT_GetLoanApplicationById.controller';
+import { MKT_CreateDraftLoanApplicationController } from './Presentation/Controllers/MKT_CreateDraftLoanApp.controller';
 
 import { AddressInternalModule } from 'src/Modules/LoanAppInternal/Modules/address-internal.module';
 import { ApprovalInternalModule } from 'src/Modules/LoanAppInternal/Modules/approval-internal.module';

@@ -15,11 +15,11 @@ export class UserForAuthRepositoryImpl implements IUserForAuthRepository {
 
   async findByEmail(email: string): Promise<UserForAuth | null> {
     const orm = await this.ormRepo.findOne({ where: { email } });
-    return orm ? new UserForAuth(orm.id, orm.email, orm.password, orm.usertype, orm.type, orm.is_active) : null;
+    return orm ? new UserForAuth(orm.id, orm.nama, orm.email, orm.password, orm.usertype, orm.type, orm.is_active) : null;
   }
 
   async findById(id: number): Promise<UserForAuth | null> {
     const orm = await this.ormRepo.findOne({ where: { id } });
-    return orm ? new UserForAuth(orm.id, orm.email, orm.password, orm.usertype, orm.type, orm.is_active) : null;
+    return orm ? new UserForAuth(orm.id, orm.nama, orm.email, orm.password, orm.usertype, orm.type, orm.is_active) : null;
   }
 }

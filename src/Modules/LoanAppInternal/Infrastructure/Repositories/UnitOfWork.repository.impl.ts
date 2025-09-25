@@ -8,7 +8,7 @@ import { ICollateralInternalRepository } from '../../Domain/Repositories/collate
 import { IFamilyInternalRepository } from '../../Domain/Repositories/family-internal.repository';
 import { IJobInternalRepository } from '../../Domain/Repositories/job-internal.repository';
 import { ILoanApplicationInternalRepository } from '../../Domain/Repositories/loanApp-internal.repository';
-import { IRelativeInternalRepository } from '../../Domain/Repositories/relatives-internal.repository';
+import { IRelativesInternalRepository } from '../../Domain/Repositories/relatives-internal.repository';
 
 // repo implementations
 import { ClientInternalRepositoryImpl } from './client-internal.repository.impl';
@@ -94,7 +94,7 @@ export class TypeOrmUnitOfWork implements IUnitOfWork {
     );
   }
 
-  get relativeRepo(): IRelativeInternalRepository {
+  get relativeRepo(): IRelativesInternalRepository {
     if (!this.queryRunner) throw new Error('Transaction not started');
     return new RelativeInternalRepositoryImpl(
       this.queryRunner.manager.getRepository(RelativeInternal_ORM_Entity),

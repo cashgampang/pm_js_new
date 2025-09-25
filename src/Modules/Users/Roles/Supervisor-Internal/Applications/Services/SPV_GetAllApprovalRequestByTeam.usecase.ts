@@ -6,7 +6,7 @@ import {
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/loanApp-internal.repository';
 
 @Injectable()
-export class SPV_GetAllApproval_ByTeam_UseCase {
+export class SPV_GetAllApprovalRequestByTeam_UseCase {
   constructor(
     @Inject(LOAN_APPLICATION_INTERNAL_REPOSITORY)
     private readonly loanAppRepo: ILoanApplicationInternalRepository,
@@ -28,7 +28,7 @@ export class SPV_GetAllApproval_ByTeam_UseCase {
         pageSize,
       );
       const { data, total } =
-        await this.loanAppRepo.callSP_SPV_GetAllApprovalHistory_ByTeam(
+        await this.loanAppRepo.callSP_SPV_GetAllApprovalRequest_Internal(
           supervisorId,
           page,
           pageSize,

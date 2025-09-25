@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RelativeInternal } from '../../Domain/Entities/relative-internal.entity';
-import { IRelativeInternalRepository } from '../../Domain/Repositories/relatives-internal.repository';
+import { RelativesInternal } from '../../Domain/Entities/relative-internal.entity';
+import { IRelativesInternalRepository } from '../../Domain/Repositories/relatives-internal.repository';
 import { RelativeInternal_ORM_Entity } from '../Entities/relative-internal.orm-entity';
 import { ClientInternal_ORM_Entity } from '../Entities/client-internal.orm-entity';
 @Injectable()
 export class RelativeInternalRepositoryImpl
-  implements IRelativeInternalRepository
+  implements IRelativesInternalRepository
 {
   constructor(
     @InjectRepository(RelativeInternal_ORM_Entity)
@@ -18,8 +18,8 @@ export class RelativeInternalRepositoryImpl
 
   //? All Transactions that using for get datas
 
-  private toDomain(orm: RelativeInternal_ORM_Entity): RelativeInternal {
-    return new RelativeInternal(
+  private toDomain(orm: RelativeInternal_ORM_Entity): RelativesInternal {
+    return new RelativesInternal(
       orm.nasabah_id!.id,
       orm.kerabat_kerja,
       orm.id,
@@ -37,7 +37,7 @@ export class RelativeInternalRepositoryImpl
   //? All Transactions that using for Create datas
 
   private toOrm(
-    domainEntity: RelativeInternal,
+    domainEntity: RelativesInternal,
   ): Partial<RelativeInternal_ORM_Entity> {
     return {
       id: domainEntity.id,
@@ -57,7 +57,7 @@ export class RelativeInternalRepositoryImpl
   //? All Transactions that using for Partial Update like PATCH or Delete
 
   private toOrmPartial(
-    partial: Partial<RelativeInternal>,
+    partial: Partial<RelativesInternal>,
   ): Partial<RelativeInternal_ORM_Entity> {
     const ormData: Partial<RelativeInternal_ORM_Entity> = {};
 
@@ -83,39 +83,62 @@ export class RelativeInternalRepositoryImpl
 
   //?===================================================================================
 
-  async findById(id: number): Promise<RelativeInternal | null> {
+  async findById(id: number): Promise<RelativesInternal | null> {
     const ormEntity = await this.ormRepository.findOne({ where: { id } });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
-  async findByNasabahId(nasabahId: number): Promise<RelativeInternal[]> {
+  async findByNasabahId(nasabahId: number): Promise<RelativesInternal[]> {
     const ormEntities = await this.ormRepository.find({
       where: { nasabah_id: { id: nasabahId } },
     });
     return ormEntities.map(this.toDomain);
   }
 
-  async save(address: RelativeInternal): Promise<RelativeInternal> {
-    const ormEntity = this.toOrm(address);
+  async save(relatives: RelativesInternal): Promise<RelativesInternal> {
+    const ormEntity = this.toOrm(relatives);
     const savedOrm = await this.ormRepository.save(ormEntity);
     return this.toDomain(savedOrm);
   }
 
   async update(
     id: number,
-    addressData: Partial<RelativeInternal>,
-  ): Promise<RelativeInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
-    if (!updated) throw new Error('Address not found');
-    return this.toDomain(updated);
+    relativesData: Partial<RelativesInternal>,
+  ): Promise<RelativesInternal> {
+    console.log('Before conversion - relativesData:', relativesData, 'id:', id);
+
+    const convertedData = this.toOrmPartial(relativesData);
+    console.log('After conversion - convertedData:', convertedData);
+
+    // Cek data sebelum update
+    const beforeUpdate = await this.ormRepository.findOne({ where: { id } });
+    console.log('Data before update:', beforeUpdate);
+
+    const result = await this.ormRepository.update(id, convertedData);
+    console.log('Update result:', result);
+
+    // Cek data setelah update dengan query fresh
+    const afterUpdate = await this.ormRepository.findOne({
+      where: { id },
+      cache: false, // Pastikan tidak pakai cache
+    });
+    console.log('Data after update (fresh query):', afterUpdate);
+
+    if (!afterUpdate) {
+      throw new Error('Relatives not found after update');
+    }
+
+    const domainResult = this.toDomain(afterUpdate);
+    console.log('Final domain result:', domainResult);
+
+    return domainResult;
   }
 
   async delete(id: number): Promise<void> {
     await this.ormRepository.softDelete(id);
   }
 
-  async findAll(): Promise<RelativeInternal[]> {
+  async findAll(): Promise<RelativesInternal[]> {
     const ormEntities = await this.ormRepository.find();
     return ormEntities.map(this.toDomain);
   }

@@ -15,4 +15,7 @@ export interface ILoanApplicationInternalRepository {
   delete(id: number): Promise<void>;
   callSP_MKT_GetAllLoanApplications_Internal(marketingId: number, page: number, pageSize: number): Promise<{data: any[], total: number}>;
   callSP_MKT_GetDetail_LoanApplicationsInternal_ById(loanAppId: number): Promise<[TypeLoanApplicationDetail[], TypeApprovalDetail[]]>;
+  callSP_SPV_GetAllApprovalHistory_ByTeam(supervisorId: number, page: number, pageSize: number): Promise<{data: any[], total: number}>;
+  callSP_SPV_GetAllApprovalRequest_Internal(supervisorId: number, page: number, pageSize: number): Promise<{data: any[], total: number}>;
+  callSP_CA_GetAllApprovalHistory(page: number, pageSize: number): Promise<{data: any[], total: number}>;
 }

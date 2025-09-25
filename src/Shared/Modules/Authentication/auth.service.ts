@@ -45,6 +45,7 @@ export class AuthService {
 
     // jangan balikin password
     const { password: _, ...result } = user;
+    console.log('result: ', result);
     return result;
   }
 

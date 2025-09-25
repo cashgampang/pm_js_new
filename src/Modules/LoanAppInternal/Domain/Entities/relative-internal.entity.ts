@@ -1,7 +1,7 @@
 // src/Modules/LoanAppInternal/Domain/Entities/relative-internal.entity.ts
 import { KerabatKerjaEnum } from 'src/Shared/Enums/Internal/Relative.enum';
 
-export class RelativeInternal {
+export class RelativesInternal {
   constructor(
     public nasabahId: number, // ID of ClientInternal
     public kerabatKerja: KerabatKerjaEnum,

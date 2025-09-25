@@ -1,16 +1,16 @@
-import { RelativeInternal } from "../Entities/relative-internal.entity";
+import { RelativesInternal } from "../Entities/relative-internal.entity";
 
 export const RELATIVE_INTERNAL_REPOSITORY = Symbol('RELATIVE_INTERNAL_REPOSITORY');
 
-export interface IRelativeInternalRepository {
-  findById(id: number): Promise<RelativeInternal | null>;
-  findByNasabahId(nasabahId: number): Promise<RelativeInternal[]>;
-  findAll(): Promise<RelativeInternal[]>;
-  save(address: RelativeInternal): Promise<RelativeInternal>;
+export interface IRelativesInternalRepository {
+  findById(id: number): Promise<RelativesInternal | null>;
+  findByNasabahId(nasabahId: number): Promise<RelativesInternal[]>;
+  findAll(): Promise<RelativesInternal[]>;
+  save(address: RelativesInternal): Promise<RelativesInternal>;
   update(
     id: number,
-    address: Partial<RelativeInternal>,
-  ): Promise<RelativeInternal>;
+    address: Partial<RelativesInternal>,
+  ): Promise<RelativesInternal>;
   delete(id: number): Promise<void>;
   // delete(id: number): Promise<void>;
 }

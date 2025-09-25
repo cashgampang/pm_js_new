@@ -110,11 +110,13 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
 
   async update(
     id: number,
-    addressData: Partial<JobInternal>,
+    jobData: Partial<JobInternal>,
   ): Promise<JobInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
-    if (!updated) throw new Error('Address not found');
+    await this.ormRepository.update(id, this.toOrmPartial(jobData));
+    const updated = await this.ormRepository.findOne({
+      where: { id },
+    });
+    if (!updated) throw new Error('Job not found');
     return this.toDomain(updated);
   }
 

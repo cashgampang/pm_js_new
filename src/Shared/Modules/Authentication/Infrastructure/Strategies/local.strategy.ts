@@ -32,6 +32,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const ok = await this.passwordHasher.compare(password, user.passwordHash);
     if (!ok) throw new UnauthorizedException('Invalid email or password');
 
-    return { id: user.id, email: user.email, usertype: user.usertype, type: user.type, is_active: user.isActive };
+    return {
+      id: user.id,
+      nama: user.nama,
+      email: user.email,
+      usertype: user.usertype,
+      type: user.type,
+      is_active: user.isActive,
+    };
   }
 }
