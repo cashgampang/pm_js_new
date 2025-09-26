@@ -1,33 +1,26 @@
-// import { Injectable, NotFoundException } from '@nestjs/common';
-// import { DataSource } from 'typeorm';
-// import { User } from 'src/Modules/Users/Domain/Entities/user.entity';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { ILoanApplicationInternalRepository, LOAN_APPLICATION_INTERNAL_REPOSITORY } from 'src/Modules/LoanAppInternal/Domain/Repositories/loanApp-internal.repository';
 
-// @Injectable()
-// export class SPV_GetTeamsUseCase {
-//   constructor(private readonly dataSource: DataSource) {}
+@Injectable()
+export class SPV_GetTeamsUseCase {
+  constructor(
+    @Inject(LOAN_APPLICATION_INTERNAL_REPOSITORY)
+    private readonly loanAppRepo: ILoanApplicationInternalRepository,
+) {}
 
-//   async execute(spv_id: number) {
-//     const teamRepo = this.dataSource.getRepository(User);
+  async execute(spv_id: number) {
+    const teams = await this.loanAppRepo.callSP_SPV_GetAllTeams_Internal(spv_id);
+    if (!teams.length) {
+      throw new NotFoundException('Tidak ada data tim di bawah supervisor ini');
+    }
 
-//     const teams = await teamRepo.find({
-//       where: {
-//         spv: { id: spv_id }, // cukup id, karena relasi ManyToOne
-//       },
-//       select: ['id', 'nama', 'email', 'usertype', 'is_active'], // ambil field yg diperlukan aja
-//     });
-
-//     if (!teams.length) {
-//       throw new NotFoundException('Tidak ada data tim di bawah supervisor ini');
-//     }
-
-//     return {
-//       teams: teams.map((team) => ({
-//         id: team.id,
-//         name: team.nama,
-//         email: team.email,
-//         role: team.usertype,
-//         status_akun: team.is_active === 1 ? 'AKTIF' : 'TIDAK AKTIF',
-//       })),
-//     };
-//   }
-// }
+    return {
+      teams: teams.map((team) => ({
+        name: team.nama,
+        email: team.email,
+        role: team.usertype,
+      })),
+    };
+  }
+}

@@ -20,6 +20,7 @@ export class CollateralInternalRepositoryImpl
   //? All Transactions that using for get datas
 
   private toDomain(orm: CollateralInternal_ORM_Entity): CollateralInternal {
+    console.log('orm > : ', orm.nasabah_id?.id);
     return new CollateralInternal(
       orm.nasabah_id!.id,
       orm.jaminan_hrd,

@@ -6,10 +6,10 @@ export interface IJobInternalRepository {
   findById(id: number): Promise<JobInternal | null>;
   findByNasabahId(nasabahId: number): Promise<JobInternal[]>;
   findAll(): Promise<JobInternal[]>;
-  save(address: JobInternal): Promise<JobInternal>;
+  save(jobData: JobInternal): Promise<JobInternal>;
   update(
     id: number,
-    address: Partial<JobInternal>,
+    jobData: Partial<JobInternal>,
   ): Promise<JobInternal>;
   delete(id: number): Promise<void>;
   // delete(id: number): Promise<void>;

@@ -13,16 +13,16 @@ export class MKT_GetLoanApplicationByIdController {
     private readonly getLoanAppByIdUseCase: MKT_GetLoanApplicationByIdUseCase,
   ) {}
 
-  //   @UseGuards(JwtAuthGuard, RolesGuard)
-  //   @Roles(USERTYPE.MARKETING)
-  @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USERTYPE.MARKETING)
+  // @Public()
   @Get('detail/:id')
   async getLoanApplicationById(@Param('id') id: number) {
     try {
       const payload = await this.getLoanAppByIdUseCase.execute(id);
 
       return {
-        payload
+        payload,
       };
     } catch (err) {
       return {

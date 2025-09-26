@@ -110,7 +110,8 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
     await this.ormRepository.update(id, this.toOrmPartial(familyData));
 
     const updated = await this.ormRepository.findOne({
-      where: { id},
+      where: { id },
+      relations: ['nasabah_id'],
     });
     if (!updated) throw new Error('Family not found');
     return this.toDomain(updated);

@@ -18,8 +18,6 @@ export class MKT_UpdateLoanApplicationController {
   constructor(
     private readonly updateLoanApplication: MKT_UpdateLoanApplicationUseCase,
   ) {}
-
-  @Public()
   @Patch('update/:id')
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -34,7 +32,7 @@ export class MKT_UpdateLoanApplicationController {
   )
   async update(
     @Param('id') clientId: number,
-    // @CurrentUser('id') marketingId: number,
+    @CurrentUser('id') marketingId: number,
     @Body() dto: any,
     @UploadedFiles()
     files: {

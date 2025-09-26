@@ -17,7 +17,7 @@ import { USERTYPE } from 'src/Shared/Enums/Users/Users.enum';
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 
 @Controller('spv/int/loan-apps')
-export class SPV_GetAllApproval_ByTeam_Controller {
+export class SPV_GetAllApprovalHistory_Controller {
   constructor(
     @Inject(SPV_GetAllApproval_ByTeam_UseCase)
     private readonly getAllApproval_ByTeam_Repo: SPV_GetAllApproval_ByTeam_UseCase,

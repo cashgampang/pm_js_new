@@ -1,58 +1,185 @@
-// import { Injectable, NotFoundException } from '@nestjs/common';
-// import { GetLoanApplicationDetailById_Service } from 'src/infrastructure/shared/InternalLoanApplications/GetLoanApplicationById.service';
-// import { DataSource, In } from 'typeorm';
-// import { ApprovalInternal } from 'src/Modules/LoanAppInternal/Infrastructure/Entities/approval-internal.orm-entity';
-// import { USERTYPE } from 'src/Shared/Enums/Users/Users.enum';
+// Applications/UseCases/MKT_GetLoanApplicationById.usecase.ts
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ILoanApplicationInternalRepository,
+  LOAN_APPLICATION_INTERNAL_REPOSITORY,
+} from 'src/Modules/LoanAppInternal/Domain/Repositories/loanApp-internal.repository';
 
-// function mapApprovalByRole(
-//   approvals: ApprovalInternal[] | null | undefined,
-//   role: USERTYPE,
-// ) {
-//   const approval = approvals?.find((a) => a.role === role);
-//   if (!approval) return null;
+import {
+  TypeLoanApplicationDetail,
+  TypeApprovalDetail,
+  TypeStatusApproval,
+} from '../../../Marketing-Internal/Applications/DTOS/MKT_CreateLoanApplication.dto';
 
-//   return {
-//     id_user: approval.user.id,
-//     name: approval.user.nama,
-//     data: approval.user
-//       ? {
-//           id_approval: approval.id,
-//           status: approval.status,
-//           keterangan: approval.keterangan,
-//           created_at: approval.created_at,
-//           updated_at: approval.updated_at,
-//         }
-//       : null,
-//   };
-// }
+@Injectable()
+export class CA_GetLoanApplicationByIdUseCase {
+  constructor(
+    @Inject(LOAN_APPLICATION_INTERNAL_REPOSITORY)
+    private readonly loanAppRepo: ILoanApplicationInternalRepository,
+  ) {}
 
-// @Injectable()
-// export class CA_GetLoanApplicationByIdUseCase {
-//   constructor(
-//     private readonly sharedLoanDetail: GetLoanApplicationDetailById_Service,
-//     private readonly dataSource: DataSource,
-//   ) {}
+  async execute(id: number) {
+    // pastikan repository return shape: [TypeLoanApplicationDetail[], TypeApprovalDetail[]]
+    const result =
+      await this.loanAppRepo.callSP_SPV_GetDetail_LoanApplicationsInternal_ById(
+        id,
+      );
 
-//   async execute(id: number) {
-//     const loanResult = await this.sharedLoanDetail.execute(id);
+    // tulis explicit typing supaya TS gak bingung
+    const [loanDataRows, approvals]: [
+      TypeLoanApplicationDetail[] | undefined,
+      TypeApprovalDetail[] | undefined,
+    ] = result as any;
 
-//     const approvalRepo = this.dataSource.getRepository(ApprovalInternal);
+    const loanData = loanDataRows?.[0];
+    if (!loanData) {
+      throw new NotFoundException(`Loan Application with id ${id} not found`);
+    }
 
-//     const approvals = await approvalRepo.find({
-//       where: {
-//         pengajuan: { id },
-//         role: In([USERTYPE.SPV, USERTYPE.CA, USERTYPE.HM]),
-//       },
-//       relations: ['user'],
-//     });
+    const loanAppStatus: Record<string, TypeStatusApproval | null> = {};
+    const appealStatus: Record<string, TypeStatusApproval | null> = {};
 
-//     return {
-//       ...loanResult,
-//       approvals: {
-//         spv: mapApprovalByRole(approvals, USERTYPE.SPV),
-//         ca: mapApprovalByRole(approvals, USERTYPE.CA),
-//         hm: mapApprovalByRole(approvals, USERTYPE.HM),
-//       },
-//     };
-//   }
-// }
+    // mapping role ke key yang konsisten
+    const roleMap: Record<string | number, string> = {
+      SPV: 'spv',
+      CA: 'ca',
+      HM: 'hm',
+      Supervisor: 'spv',
+      'Credit Analyst': 'ca',
+      'Head Marketing': 'hm',
+      1: 'spv',
+      2: 'ca',
+      3: 'hm',
+    };
+
+    // === IMPORTANT: approvals is TypeApprovalDetail[] ===
+    (approvals ?? []).forEach((approval: TypeApprovalDetail) => {
+      const roleKey = roleMap[approval.role] ?? approval.role;
+
+      const data: TypeStatusApproval = {
+        id_user: approval.user_id,
+        name: approval.user_nama,
+        data: {
+          id_approval: approval.approval_id,
+          status: approval.status,
+          keterangan: approval.keterangan,
+          kesimpulan: approval.kesimpulan,
+          created_at: approval.created_at,
+          updated_at: approval.updated_at,
+        },
+      };
+
+      // handle both number and string just in case
+      const isBanding = approval.is_banding === 1;
+
+      if (isBanding) {
+        appealStatus[roleKey] = data;
+      } else {
+        loanAppStatus[roleKey] = data;
+      }
+    });
+
+    return {
+      error: false,
+      message: 'Loan Application Detail by ID retrieved successfully',
+      reference: 'LOAN_RETRIEVE_OK',
+      data: {
+        client_and_loan_detail: {
+          clients_internal: {
+            client_id: loanData.client_id,
+            nama_lengkap: loanData.nama_lengkap,
+            no_ktp: loanData.no_ktp,
+            jenis_kelamin: loanData.jenis_kelamin,
+            tempat_lahir: loanData.tempat_lahir,
+            tanggal_lahir: loanData.tanggal_lahir,
+            no_hp: loanData.no_hp,
+            status_nikah: loanData.status_nikah,
+            email: loanData.email,
+            no_rekening: loanData.no_rekening,
+          },
+          address_internal: {
+            alamat_ktp: loanData.alamat_ktp,
+            kelurahan: loanData.kelurahan,
+            rt_rw: loanData.rt_rw,
+            kecamatan: loanData.kecamatan,
+            kota: loanData.kota,
+            provinsi: loanData.provinsi,
+            status_rumah_ktp: loanData.status_rumah_ktp,
+            status_rumah: loanData.status_rumah,
+            domisili: loanData.domisili,
+            alamat_lengkap: loanData.alamat_lengkap,
+          },
+
+          collateral_internal: {
+            jaminan_hrd: loanData.jaminan_hrd,
+            jaminan_cg: loanData.jaminan_cg,
+            penjamin: loanData.penjamin,
+            nama_penjamin: loanData.nama_penjamin,
+            lama_kerja_penjamin: loanData.lama_kerja_penjamin,
+            bagian: loanData.bagian,
+            absensi: loanData.absensi,
+            riwayat_pinjam_penjamin: loanData.riwayat_pinjam_penjamin,
+            riwayat_nominal_penjamin: loanData.riwayat_nominal_penjamin,
+            riwayat_tenor_penjamin: loanData.riwayat_tenor_penjamin,
+            sisa_pinjaman_penjamin: loanData.sisa_pinjaman_penjamin,
+            jaminan_cg_penjamin: loanData.jaminan_cg_penjamin,
+            status_hubungan_penjamin: loanData.status_hubungan_penjamin,
+          },
+          family_internal: {
+            hubungan: loanData.family_hubungan,
+            nama: loanData.nama_keluarga,
+            bekerja: loanData.bekerja,
+            nama_perusahaan: loanData.nama_perusahaan,
+            jabatan: loanData.jabatan,
+            penghasilan: loanData.penghasilan,
+            alamat_kerja: loanData.alamat_kerja,
+            no_hp: loanData.no_hp_keluarga,
+          },
+          job_internal: {
+            perusahaan: loanData.perusahaan,
+            divisi: loanData.divisi,
+            lama_kerja_tahun: loanData.lama_kerja_tahun,
+            lama_kerja_bulan: loanData.lama_kerja_bulan,
+            golongan: loanData.golongan,
+            yayasan: loanData.yayasan,
+            nama_atasan: loanData.nama_atasan,
+            nama_hrd: loanData.nama_hrd,
+            absensi: loanData.absensi,
+          },
+          loan_internal: {
+            status_pinjaman: loanData.status_pinjaman,
+            nominal_pinjaman: loanData.nominal_pinjaman,
+            pinjaman_ke: loanData.pinjaman_ke,
+            tenor: loanData.tenor,
+            keperluan: loanData.keperluan,
+            status: loanData.status,
+            riwayat_nominal: loanData.riwayat_nominal,
+            riwayat_tenor: loanData.riwayat_tenor,
+            sisa_pinjaman: loanData.sisa_pinjaman,
+            notes: loanData.notes,
+            is_banding: loanData.is_banding,
+            alasan_banding: loanData.alasan_banding,
+          },
+          relatives_internal: {
+            kerabat_kerja: loanData.kerabat_kerja,
+            nama: loanData.nama_kerabat_kerja,
+            alamat: loanData.alamat_kerabat_kerja,
+            no_hp: loanData.no_hp_kerabat_kerja,
+            status_hubungan: loanData.status_hubungan_kerabat_kerja,
+            nama_perusahaan: loanData.nama_perusahaan_kerabat_kerja,
+          },
+          documents_files: {
+            foto_ktp: loanData.foto_ktp,
+            foto_kk: loanData.foto_kk,
+            foto_id_card: loanData.foto_id_card,
+            foto_rekening: loanData.foto_rekening,
+            bukti_absensi_file: loanData.bukti_absensi_file,
+          },
+        },
+
+        loan_app_status: loanAppStatus,
+        appeal_status: appealStatus,
+      },
+    };
+  }
+}

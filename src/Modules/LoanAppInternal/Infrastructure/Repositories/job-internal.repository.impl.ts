@@ -17,6 +17,7 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
   //? All Transactions that using for get datas
 
   private toDomain(orm: JobInternal_ORM_Entity): JobInternal {
+    console.log('orm > : ', orm.nasabah_id?.id);
     return new JobInternal(
       orm.nasabah_id!.id,
       orm.perusahaan,
@@ -115,6 +116,7 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
     await this.ormRepository.update(id, this.toOrmPartial(jobData));
     const updated = await this.ormRepository.findOne({
       where: { id },
+      relations: ['nasabah_id'], // Force load relasi sebagai object
     });
     if (!updated) throw new Error('Job not found');
     return this.toDomain(updated);

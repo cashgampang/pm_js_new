@@ -13,7 +13,7 @@ export class JobInternalService {
 
   async create(dto: CreateJobDto): Promise<JobInternal> {
     const now = new Date();
-    const address = new JobInternal(
+    const jobs = new JobInternal(
       dto.nasabah_id,
       dto.perusahaan,
       dto.divisi,
@@ -30,7 +30,7 @@ export class JobInternalService {
       dto.bukti_absensi,
       now,
     );
-    return this.repo.save(address);
+    return this.repo.save(jobs);
   }
 
   async update(id: number, dto: UpdateJobDto): Promise<JobInternal> {

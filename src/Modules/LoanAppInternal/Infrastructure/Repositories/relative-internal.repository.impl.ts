@@ -103,35 +103,15 @@ export class RelativeInternalRepositoryImpl
 
   async update(
     id: number,
-    relativesData: Partial<RelativesInternal>,
+    relativeData: Partial<RelativesInternal>,
   ): Promise<RelativesInternal> {
-    console.log('Before conversion - relativesData:', relativesData, 'id:', id);
-
-    const convertedData = this.toOrmPartial(relativesData);
-    console.log('After conversion - convertedData:', convertedData);
-
-    // Cek data sebelum update
-    const beforeUpdate = await this.ormRepository.findOne({ where: { id } });
-    console.log('Data before update:', beforeUpdate);
-
-    const result = await this.ormRepository.update(id, convertedData);
-    console.log('Update result:', result);
-
-    // Cek data setelah update dengan query fresh
-    const afterUpdate = await this.ormRepository.findOne({
+    await this.ormRepository.update(id, this.toOrmPartial(relativeData));
+    const updated = await this.ormRepository.findOne({
       where: { id },
-      cache: false, // Pastikan tidak pakai cache
+      relations: ['nasabah_id'],
     });
-    console.log('Data after update (fresh query):', afterUpdate);
-
-    if (!afterUpdate) {
-      throw new Error('Relatives not found after update');
-    }
-
-    const domainResult = this.toDomain(afterUpdate);
-    console.log('Final domain result:', domainResult);
-
-    return domainResult;
+    if (!updated) throw new Error('Job not found');
+    return this.toDomain(updated);
   }
 
   async delete(id: number): Promise<void> {

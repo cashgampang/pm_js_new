@@ -11,7 +11,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 
-@Entity('jobs_internal')
+@Entity('job_internal')
 export class JobInternal_ORM_Entity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;

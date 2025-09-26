@@ -6,9 +6,7 @@ import { IClientInternalRepository } from '../../Domain/Repositories/client-inte
 import { ClientInternal_ORM_Entity } from '../Entities/client-internal.orm-entity';
 import { Users_ORM_Entity } from 'src/Modules/Users/Infrastructure/Entities/users.orm-entity';
 @Injectable()
-export class ClientInternalRepositoryImpl
-  implements IClientInternalRepository
-{
+export class ClientInternalRepositoryImpl implements IClientInternalRepository {
   constructor(
     @InjectRepository(ClientInternal_ORM_Entity)
     private readonly ormRepository: Repository<ClientInternal_ORM_Entity>,
@@ -105,40 +103,43 @@ export class ClientInternalRepositoryImpl
 
   //?===================================================================================
 
-  async findById(id: number): Promise<ClientInternal | null> {
-    const ormEntity = await this.ormRepository.findOne({ where: { id } });
-    return ormEntity ? this.toDomain(ormEntity) : null;
-  }
+    async findById(id: number): Promise<ClientInternal | null> {
+      const ormEntity = await this.ormRepository.findOne({ where: { id } });
+      return ormEntity ? this.toDomain(ormEntity) : null;
+    }
 
-  async findByMarketingId(marketingId: number): Promise<ClientInternal[]> {
-    const ormEntities = await this.ormRepository.find({
-      where: { marketing: { id: marketingId } },
-    });
-    return ormEntities.map(this.toDomain);
-  }
+    async findByMarketingId(marketingId: number): Promise<ClientInternal[]> {
+      const ormEntities = await this.ormRepository.find({
+        where: { marketing: { id: marketingId } },
+      });
+      return ormEntities.map(this.toDomain);
+    }
 
-  async save(address: ClientInternal): Promise<ClientInternal> {
-    const ormEntity = this.toOrm(address);
-    const savedOrm = await this.ormRepository.save(ormEntity);
-    return this.toDomain(savedOrm);
-  }
+    async save(address: ClientInternal): Promise<ClientInternal> {
+      const ormEntity = this.toOrm(address);
+      const savedOrm = await this.ormRepository.save(ormEntity);
+      return this.toDomain(savedOrm);
+    }
 
-  async update(
-    id: number,
-    addressData: Partial<ClientInternal>,
-  ): Promise<ClientInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
-    if (!updated) throw new Error('Address not found');
-    return this.toDomain(updated);
-  }
+    async update(
+      id: number,
+      addressData: Partial<ClientInternal>,
+    ): Promise<ClientInternal> {
+      await this.ormRepository.update(id, this.toOrmPartial(addressData));
+      const updated = await this.ormRepository.findOne({
+        where: { id },
+        relations: ['marketing'],
+      });
+      if (!updated) throw new Error('Address not found');
+      return this.toDomain(updated);
+    }
 
-  async delete(id: number): Promise<void> {
-    await this.ormRepository.softDelete(id);
-  }
+    async delete(id: number): Promise<void> {
+      await this.ormRepository.softDelete(id);
+    }
 
-  async findAll(): Promise<ClientInternal[]> {
-    const ormEntities = await this.ormRepository.find();
-    return ormEntities.map(this.toDomain);
-  }
+    async findAll(): Promise<ClientInternal[]> {
+      const ormEntities = await this.ormRepository.find();
+      return ormEntities.map(this.toDomain);
+    }
 }

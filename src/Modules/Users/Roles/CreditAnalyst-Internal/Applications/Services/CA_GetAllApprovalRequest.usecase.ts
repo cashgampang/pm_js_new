@@ -1,62 +1,59 @@
-// import { Injectable } from '@nestjs/common';
-// import { DataSource } from 'typeorm';
+// src/Modules/LoanAppInternal/Application/mkt-get-all-loan-application.usecase.ts
+import { Injectable, Inject } from '@nestjs/common';
+import {
+  ILoanApplicationInternalRepository,
+  LOAN_APPLICATION_INTERNAL_REPOSITORY,
+} from 'src/Modules/LoanAppInternal/Domain/Repositories/loanApp-internal.repository';
 
-// @Injectable()
-// export class CA_GetAllApprovalsUseCase {
-//   constructor(private readonly dataSource: DataSource) {}
+@Injectable()
+export class CA_GetAllApprovalRequest_UseCase {
+  constructor(
+    @Inject(LOAN_APPLICATION_INTERNAL_REPOSITORY)
+    private readonly loanAppRepo: ILoanApplicationInternalRepository,
+  ) {}
 
-//   async execute(
-//     page = 1,          // default page 1
-//     pageSize = 10,     // default pageSize 10
-//     searchQuery = '',  // optional pencarian
-//   ) {
-//     // Panggil stored procedure dengan parameter untuk mengambil data yang sudah dipaginasi
-//     const result = await this.dataSource.query(
-//       `CALL CA_GetAllApprovals_Internal(?, ?);`,
-//       [page, pageSize],
-//     );
+  async execute(
+    page = 1,
+    pageSize = 10,
+    searchQuery = '',
+  ) {
+    try {
+      console.log(
+        'page: ',
+        page,
+        'pageSize: ',
+        pageSize,
+      );
+      const { data, total } =
+        await this.loanAppRepo.callSP_CA_GetAllApprovalRequest_Internal(
+          page,
+          pageSize,
+        );
 
-//     if (!result || result.length === 0) {
-//       throw new Error('No data returned from stored procedure');
-//     }
+      if (!data) {
+        throw new Error('Data pengajuan tidak ditemukan');
+      }
 
-//     // Mapping data dari SP
-//     let data =
-//       result[0]?.map((item) => ({
-//         nama_nasabah: item.nama_nasabah,
-//         keperluan: item.keperluan,
-//         nominal_pinjaman: item.nominal_pinjaman,
-//         nama_marketing: item.nama_marketing,
-//         nama_supervisor: item.nama_supervisor,
-//       })) || [];
+      // Jika ada searchQuery, filter hasilnya
+      const filteredData = searchQuery
+        ? data.filter((item) =>
+            item.nasabah_nama.toLowerCase().includes(searchQuery.toLowerCase()),
+          )
+        : data;
 
-//     // Jika ada searchQuery, filter hasilnya
-//     if (searchQuery) {
-//       const q = searchQuery.toLowerCase();
-//       data = data.filter(
-//         (item) =>
-//           item.nama_nasabah.toLowerCase().includes(q) ||
-//           item.nama_marketing.toLowerCase().includes(q) ||
-//           (item.nama_supervisor &&
-//             item.nama_supervisor.toLowerCase().includes(q)),
-//       );
-//     }
+      console.log('filteredData: ', filteredData);
 
-//     // Ambil total data (tanpa pagination) → panggil SP dengan pageSize besar
-//     const totalResult = await this.dataSource.query(
-//       `CALL CA_GetAllApprovals_Internal(?, ?);`,
-//       [1, 9999999], // semua data di page 1
-//     );
+      const formattedData = filteredData.map((item) => ({
+        id_nasabah: Number(item.nasabah_id),
+        nama_nasabah: item.nasabah_nama,
+        id_marketing: Number(item.user_id),
+        nama_marketing: item.marketing_nama,
+        status: item.loan_status,
+      }));
 
-//     const resultData = totalResult[0] || [];
-//     const total = resultData.length > 0 ? resultData.length : 0;
-
-//     // Return hasil + pagination
-//     return {
-//       data,
-//       total,
-//       page,
-//       pageSize,
-//     };
-//   }
-// }
+      return { data: formattedData, total }; // Total tetep pake nilai asli dari SP
+    } catch (err) {
+      throw new Error(err.message || 'Gagal mengambil data pengajuan');
+    }
+  }
+}

@@ -25,6 +25,7 @@ export class LoanApplicationInternalRepositoryImpl
   private toDomain(
     orm: LoanApplicationInternal_ORM_Entity,
   ): LoanApplicationInternal {
+    console.log('orm > : ', orm);
     return new LoanApplicationInternal(
       orm.nasabah_id!.id,
       orm.status_pinjaman,
@@ -110,14 +111,21 @@ export class LoanApplicationInternalRepositoryImpl
   async findById(id: number): Promise<LoanApplicationInternal | null> {
     const ormEntity = await this.ormRepository.findOne({
       where: { id },
+      relations: ['nasabah_id'], // Force load relasi sebagai object
     });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
   async findByNasabahId(nasabahId: number): Promise<LoanApplicationInternal[]> {
+    console.log('REMEMBER SUMMER DAAYYYSSSS >>>>>>>>>>>>>>>> > : ', nasabahId);
     const ormEntities = await this.ormRepository.find({
       where: { nasabah_id: { id: nasabahId } },
+      relations: ['nasabah_id'],
     });
+    console.log(
+      'REMEMBER SUMMER DAAYYYSSSS >>>>>>>>>>>>>>>> > : ',
+      ormEntities,
+    );
     return ormEntities.map(this.toDomain);
   }
 
@@ -136,6 +144,7 @@ export class LoanApplicationInternalRepositoryImpl
     await this.ormRepository.update(id, this.toOrmPartial(loanAppData));
     const updated = await this.ormRepository.findOne({
       where: { id },
+      relations: ['nasabah_id'], // Force load relasi sebagai object
     });
     if (!updated) throw new Error('Loan Application not found');
     return this.toDomain(updated);
@@ -213,13 +222,34 @@ export class LoanApplicationInternalRepositoryImpl
     };
   }
 
-  async callSP_CA_GetAllApprovalHistory(
+  async callSP_SPV_GetDetail_LoanApplicationsInternal_ById(
+    loanAppId: number,
+  ): Promise<[TypeLoanApplicationDetail[], TypeApprovalDetail[]]> {
+    const results: [TypeLoanApplicationDetail[], TypeApprovalDetail[]] =
+      await this.ormRepository.manager.query(
+        `CALL SPV_GetLoanApplicationById_Internal(?)`,
+        [loanAppId],
+      );
+
+    return results;
+  }
+
+  async callSP_SPV_GetAllTeams_Internal(supervisorId: number): Promise<any[]> {
+    const ormEntities = this.ormRepository.manager;
+    const result = await ormEntities.query(
+      `CALL SPV_GetAllTeams_Internal(?)`,
+      [supervisorId],
+    );
+    return result[0];
+  }
+
+  async callSP_CA_GetAllApprovalHistory_Internal(
     page: number,
     pageSize: number,
   ): Promise<{ data: any[]; total: number }> {
     const ormEntities = this.ormRepository.manager;
     const result = await ormEntities.query(
-      `CALL CA_GetApprovalHistory_Internal(?, ?, ?);`,
+      `CALL CA_GetApprovalHistory_Internal(?, ?);`,
       [page, pageSize],
     );
 
@@ -227,5 +257,33 @@ export class LoanApplicationInternalRepositoryImpl
       data: result[1] || [],
       total: result[0] ? result[1][0]?.total || 0 : 0,
     };
+  }
+
+  async callSP_CA_GetAllApprovalRequest_Internal(
+    page: number,
+    pageSize: number,
+  ): Promise<{ data: any[]; total: number }> {
+    const ormEntities = this.ormRepository.manager;
+    const result = await ormEntities.query(
+      `CALL SPV_GetAllApprovalRequest_Internal(?, ?);`,
+      [page, pageSize],
+    );
+
+    return {
+      data: result[1] || [],
+      total: result[0] ? result[1][0]?.total || 0 : 0,
+    };
+  }
+
+  async callSP_CA_GetDetail_LoanApplicationsInternal_ById(
+    loanAppId: number,
+  ): Promise<[TypeLoanApplicationDetail[], TypeApprovalDetail[]]> {
+    const results: [TypeLoanApplicationDetail[], TypeApprovalDetail[]] =
+      await this.ormRepository.manager.query(
+        `CALL CA_GetLoanApplicationById_Internal(?)`,
+        [loanAppId],
+      );
+
+    return results;
   }
 }
