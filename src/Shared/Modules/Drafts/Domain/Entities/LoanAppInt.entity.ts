@@ -10,6 +10,9 @@ export class LoanApplicationEntity {
   collateral_internal?: any;
   relative_internal?: any;
 
+  uploaded_files?: any;
+  isDeleted?: boolean;
+
   constructor(partial: Partial<LoanApplicationEntity>) {
     Object.assign(this, partial);
   }

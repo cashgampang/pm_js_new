@@ -5,19 +5,41 @@ import {
 } from 'src/Shared/Modules/Drafts/Domain/Repositories/LoanAppInt.repository';
 import { CreateDraftLoanApplicationDto } from 'src/Shared/Modules/Drafts/Applications/DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
 import { LoanApplicationEntity } from 'src/Shared/Modules/Drafts/Domain/Entities/LoanAppInt.entity';
+import {
+  FILE_STORAGE_SERVICE,
+  IFileStorageService,
+} from 'src/Shared/Modules/Storage/Domain/Services/IFileStorage.service';
 
 @Injectable()
 export class MKT_CreateDraftLoanApplicationUseCase {
   constructor(
     @Inject(CREATE_DRAFT_LOAN_APPLICATION_REPOSITORY)
     private readonly loanAppDraftRepo: ILoanApplicationDraftRepository,
+
+    @Inject(FILE_STORAGE_SERVICE)
+    private readonly fileStorage: IFileStorageService,
   ) {}
 
   async executeCreateDraft(
     marketingId: number,
     dto: CreateDraftLoanApplicationDto,
+    files?: Record<string, Express.Multer.File[]>,
   ) {
+
     try {
+      let filePaths: Record<string, string[]> = {};
+
+      if (files && Object.keys(files).length > 0) {
+        filePaths = await this.fileStorage.saveDraftsFile(
+          marketingId,
+          dto.payload.client_internal?.nama_lengkap ?? `draft-${marketingId}`,
+          files,
+        );
+      }
+
+      console.log('File paths:', filePaths);
+      console.log('Payload:', dto.payload);
+
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,
         client_internal: dto.payload.client_internal,
@@ -27,6 +49,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         loan_application_internal: dto.payload.loan_application_internal,
         collateral_internal: dto.payload.collateral_internal,
         relative_internal: dto.payload.relative_internal,
+        uploaded_files: filePaths,
       });
 
       return {
@@ -103,7 +126,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         },
       };
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new HttpException(
         {
           payload: {
@@ -148,10 +171,21 @@ export class MKT_CreateDraftLoanApplicationUseCase {
   async updateDraftById(
     Id: string,
     updateData: Partial<CreateDraftLoanApplicationDto>,
+    files?: Record<string, Express.Multer.File[]>,
   ) {
     const { payload } = updateData;
+    let filePaths: Record<string, string[]> = {};
+
+    if (files && Object.keys(files).length > 0) {
+      filePaths = await this.fileStorage.saveDraftsFile(
+        Number(payload?.client_internal?.no_ktp) ?? Id,
+        payload?.client_internal?.nama_lengkap ?? `draft-${Id}`,
+        files,
+      );
+    }
     const entityUpdate: Partial<LoanApplicationEntity> = {
       ...payload, //spread it
+      ...(Object.keys(filePaths).length > 0 && { uploaded_files: filePaths }),
     };
 
     try {
