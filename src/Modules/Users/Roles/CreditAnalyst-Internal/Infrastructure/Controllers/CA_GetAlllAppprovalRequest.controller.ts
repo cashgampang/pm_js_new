@@ -28,24 +28,28 @@ export class CA_GetAllApprovalRequest_Controller {
   @Roles(USERTYPE.CA)
   @Get('/request')
   async getAllLoanApplications(
-    @CurrentUser('id') supervisorId: number,
     @Query('page') page: number = 1,
     @Query('pageSize') pageSize: number = 10,
     @Query('searchQuery') searchQuery = '',
   ) {
     try {
-      console.log('spv', supervisorId, page, pageSize);
       const result = await this.getAllApprovalRequest_Repo.execute(
         page,
         pageSize,
         searchQuery,
       );
       return {
-        success: true,
-        data: result.data,
-        page,
-        pageSize,
-        total: result.total,
+        payload: {
+          error: false,
+          message: 'Get Loan Application by ID was successfuly retrieved',
+          reference: 'LOAN_RETRIEVE_OK',
+          data: {
+            results: result.data,
+            page,
+            pageSize,
+            total: result.total,
+          },
+        },
       };
     } catch (err) {
       console.log(err);

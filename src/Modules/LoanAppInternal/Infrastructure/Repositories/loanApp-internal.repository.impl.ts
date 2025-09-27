@@ -265,12 +265,12 @@ export class LoanApplicationInternalRepositoryImpl
   ): Promise<{ data: any[]; total: number }> {
     const ormEntities = this.ormRepository.manager;
     const result = await ormEntities.query(
-      `CALL SPV_GetAllApprovalRequest_Internal(?, ?);`,
+      `CALL CA_GetAllApprovalRequest_Internal(?, ?);`,
       [page, pageSize],
     );
 
     return {
-      data: result[1] || [],
+      data: result[0] || [],
       total: result[0] ? result[1][0]?.total || 0 : 0,
     };
   }

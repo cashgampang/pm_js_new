@@ -45,11 +45,20 @@ export class SPV_GetAllApproval_ByTeam_UseCase {
           )
         : data;
 
-      console.log('filteredData: ', filteredData);
+      const parseNominalPinjaman = filteredData.map((data) => {
+        const nominal = Number(data.nominal_pinjaman);
+        const formattedNominal = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        }).format(nominal);
+        return formattedNominal;
+      });
 
       const formattedData = filteredData.map((item) => ({
+        id_pengajuan: Number(item.loan_id),
         id_nasabah: Number(item.nasabah_id),
         nama_nasabah: item.nasabah_nama,
+        nominal_pinjaman: parseNominalPinjaman[0],
         id_marketing: Number(item.user_id),
         nama_marketing: item.marketing_nama,
         status: item.loan_status,

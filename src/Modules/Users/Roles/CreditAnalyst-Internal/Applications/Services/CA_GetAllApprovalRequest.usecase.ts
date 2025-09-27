@@ -12,18 +12,9 @@ export class CA_GetAllApprovalRequest_UseCase {
     private readonly loanAppRepo: ILoanApplicationInternalRepository,
   ) {}
 
-  async execute(
-    page = 1,
-    pageSize = 10,
-    searchQuery = '',
-  ) {
+  async execute(page = 1, pageSize = 10, searchQuery = '') {
     try {
-      console.log(
-        'page: ',
-        page,
-        'pageSize: ',
-        pageSize,
-      );
+      console.log('page: ', page, 'pageSize: ', pageSize);
       const { data, total } =
         await this.loanAppRepo.callSP_CA_GetAllApprovalRequest_Internal(
           page,
@@ -37,18 +28,28 @@ export class CA_GetAllApprovalRequest_UseCase {
       // Jika ada searchQuery, filter hasilnya
       const filteredData = searchQuery
         ? data.filter((item) =>
-            item.nasabah_nama.toLowerCase().includes(searchQuery.toLowerCase()),
+            item.nama_nasabah.toLowerCase().includes(searchQuery.toLowerCase()),
           )
         : data;
 
-      console.log('filteredData: ', filteredData);
+      console.log('icikiwir >>>', filteredData);
+
+      const parseNominalPinjaman = filteredData.map((data) => {
+        const nominal = Number(data.nominal_pinjaman);
+        const formattedNominal = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        }).format(nominal);
+        return formattedNominal;
+      });
 
       const formattedData = filteredData.map((item) => ({
-        id_nasabah: Number(item.nasabah_id),
-        nama_nasabah: item.nasabah_nama,
-        id_marketing: Number(item.user_id),
-        nama_marketing: item.marketing_nama,
-        status: item.loan_status,
+        id_pengajuan: Number(item.loan_id),
+        nama_nasabah: item.nama_nasabah,
+        nominal_pinjaman: parseNominalPinjaman[0],
+        nama_marketing: item.nama_marketing,
+        nama_supervisor: item.nama_supervisor,
+        status: item.status_pengajuan,
       }));
 
       return { data: formattedData, total }; // Total tetep pake nilai asli dari SP

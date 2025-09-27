@@ -12,18 +12,9 @@ export class CA_GetAllApprovalHistory_UseCase {
     private readonly loanAppRepo: ILoanApplicationInternalRepository,
   ) {}
 
-  async execute(
-    page = 1,
-    pageSize = 10,
-    searchQuery = '',
-  ) {
+  async execute(page = 1, pageSize = 10, searchQuery = '') {
     try {
-      console.log(
-        'page: ',
-        page,
-        'pageSize: ',
-        pageSize,
-      );
+      console.log('page: ', page, 'pageSize: ', pageSize);
       const { data, total } =
         await this.loanAppRepo.callSP_CA_GetAllApprovalHistory_Internal(
           page,
@@ -41,11 +32,20 @@ export class CA_GetAllApprovalHistory_UseCase {
           )
         : data;
 
-      console.log('filteredData: ', filteredData);
+      const parseNominalPinjaman = filteredData.map((data) => {
+        const nominal = Number(data.nominal_pinjaman);
+        const formattedNominal = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        }).format(nominal);
+        return formattedNominal;
+      });
 
       const formattedData = filteredData.map((item) => ({
+        id_pengajuan: Number(item.loan_id),
         id_nasabah: Number(item.nasabah_id),
         nama_nasabah: item.nasabah_nama,
+        nominal_pinjaman: parseNominalPinjaman[0],
         id_marketing: Number(item.user_id),
         nama_marketing: item.marketing_nama,
         status: item.loan_status,

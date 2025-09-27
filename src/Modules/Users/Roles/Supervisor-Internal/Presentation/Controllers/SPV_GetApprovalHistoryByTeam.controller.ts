@@ -42,11 +42,17 @@ export class SPV_GetAllApprovalHistory_Controller {
         searchQuery,
       );
       return {
-        success: true,
-        data: result.data,
-        page,
-        pageSize,
-        total: result.total,
+        payload: {
+          error: false,
+          message: 'Get Loan Application by ID was successfuly retrieved',
+          reference: 'LOAN_RETRIEVE_OK',
+          data: {
+            results: result.data,
+            page,
+            pageSize,
+            total: result.total,
+          },
+        },
       };
     } catch (err) {
       console.log(err);
