@@ -5,7 +5,8 @@ import {
   UploadedFiles,
   UseInterceptors,
   BadRequestException, // Import BadRequestException untuk melemparkan error
-  InternalServerErrorException, // Import InternalServerErrorException
+  InternalServerErrorException,
+  UseGuards, // Import InternalServerErrorException
 } from '@nestjs/common';
 import { MKT_CreateLoanApplicationUseCase } from '../../Applications/Services/MKT_CreateLoanApplication.usecase';
 import {
@@ -14,6 +15,10 @@ import {
 } from '@nestjs/platform-express';
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 import { Public } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/public.decorator';
+import { Roles } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/jwtAuth.guard';
+import { RolesGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/roles.guard';
+import { USERTYPE } from 'src/Shared/Enums/Users/Users.enum';
 
 @Controller('mkt/int/loan-apps')
 export class MKT_CreateLoanApplicationController {
@@ -21,7 +26,8 @@ export class MKT_CreateLoanApplicationController {
     private readonly createLoanApplication: MKT_CreateLoanApplicationUseCase,
   ) {}
 
-  @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USERTYPE.MARKETING)
   @Post('create')
   @UseInterceptors(
     FileFieldsInterceptor([

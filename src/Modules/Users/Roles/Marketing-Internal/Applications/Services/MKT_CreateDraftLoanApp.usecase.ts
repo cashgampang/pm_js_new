@@ -1,9 +1,18 @@
-import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Inject,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CREATE_DRAFT_LOAN_APPLICATION_REPOSITORY,
   ILoanApplicationDraftRepository,
 } from 'src/Shared/Modules/Drafts/Domain/Repositories/LoanAppInt.repository';
-import { CreateDraftLoanApplicationDto } from 'src/Shared/Modules/Drafts/Applications/DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
+import {
+  CreateDraftLoanApplicationDto,
+  PayloadDTO,
+} from 'src/Shared/Modules/Drafts/Applications/DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
 import { LoanApplicationEntity } from 'src/Shared/Modules/Drafts/Domain/Entities/LoanAppInt.entity';
 import {
   FILE_STORAGE_SERVICE,
@@ -22,38 +31,31 @@ export class MKT_CreateDraftLoanApplicationUseCase {
 
   async executeCreateDraft(
     marketingId: number,
-    dto: CreateDraftLoanApplicationDto,
+    dto: PayloadDTO,
     files?: Record<string, Express.Multer.File[]>,
   ) {
-
     try {
       let filePaths: Record<string, string[]> = {};
 
       if (files && Object.keys(files).length > 0) {
         filePaths = await this.fileStorage.saveDraftsFile(
           marketingId,
-          dto.payload.client_internal?.nama_lengkap ?? `draft-${marketingId}`,
+          dto.client_internal?.nama_lengkap ?? `draft-${marketingId}`,
           files,
         );
       }
 
       console.log('File paths:', filePaths);
-      console.log('Payload:', dto.payload);
+      console.log('Payload:', dto);
 
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,
-        client_internal: dto.payload.client_internal,
-        address_internal: dto.payload.address_internal,
-        family_internal: dto.payload.family_internal,
-        job_internal: dto.payload.job_internal,
-        loan_application_internal: dto.payload.loan_application_internal,
-        collateral_internal: dto.payload.collateral_internal,
-        relative_internal: dto.payload.relative_internal,
+        ...dto,
         uploaded_files: filePaths,
       });
 
       return {
-        payload: {
+        dto: {
           error: false,
           message: 'Draft loan application created',
           reference: 'LOAN_CREATE_OK',
@@ -61,6 +63,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         },
       };
     } catch (err) {
+      console.log(err);
       if (err.name === 'ValidationError') {
         throw new HttpException(
           {
@@ -100,6 +103,52 @@ export class MKT_CreateDraftLoanApplicationUseCase {
     }
   }
 
+  async renderDraftById(Id: string) {
+    try {
+      const loanApp = await this.loanAppDraftRepo.findById(Id);
+      if (!loanApp) {
+        throw new HttpException(
+          {
+            payload: {
+              error: 'NOT FOUND',
+              message: 'No draft loan applications found for this ID',
+              reference: 'LOAN_NOT_FOUND',
+            },
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        error: false,
+        message: 'Draft loan applications retrieved',
+        reference: 'LOAN_RETRIEVE_OK',
+        data: {
+          client_and_loan_detail: {
+            ...loanApp,
+          },
+        },
+      };
+    } catch (error) {
+      console.log(error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          payload: {
+            error: true,
+            message: 'Unexpected error',
+            reference: 'LOAN_UNKNOWN_ERROR',
+          },
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async renderDraftByMarketingId(marketingId: number) {
     try {
       const loanApps =
@@ -109,7 +158,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         throw new HttpException(
           {
             payload: {
-              error: true,
+              error: 'NOT FOUND',
               message: 'No draft loan applications found for this marketing ID',
               reference: 'LOAN_NOT_FOUND',
             },
@@ -127,10 +176,15 @@ export class MKT_CreateDraftLoanApplicationUseCase {
       };
     } catch (error) {
       console.log(error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         {
           payload: {
-            error: 'Unexpected error',
+            error: true,
             message: 'Unexpected error',
             reference: 'LOAN_UNKNOWN_ERROR',
           },
@@ -167,7 +221,6 @@ export class MKT_CreateDraftLoanApplicationUseCase {
       );
     }
   }
-
   async updateDraftById(
     Id: string,
     updateData: Partial<CreateDraftLoanApplicationDto>,
@@ -183,16 +236,28 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         files,
       );
     }
-    const entityUpdate: Partial<LoanApplicationEntity> = {
-      ...payload, //spread it
-      ...(Object.keys(filePaths).length > 0 && { uploaded_files: filePaths }),
-    };
 
     try {
+      const existingDraft = await this.loanAppDraftRepo.findById(Id);
+      if (!existingDraft) {
+        throw new NotFoundException(`Draft with id ${Id} not found`);
+      }
+
+      const mergedFiles = {
+        ...(existingDraft.uploaded_files || {}),
+        ...(Object.keys(filePaths).length > 0 ? filePaths : {}),
+      };
+
+      const entityUpdate: Partial<LoanApplicationEntity> = {
+        ...payload,
+        uploaded_files: mergedFiles,
+      };
+
       const loanApp = await this.loanAppDraftRepo.updateDraftById(
         Id,
         entityUpdate,
       );
+
       throw new HttpException(
         {
           payload: {
@@ -205,11 +270,17 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         HttpStatus.OK,
       );
     } catch (error) {
+      console.log(error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException(
         {
           payload: {
-            error: 'Unexpected error',
-            message: error.message || 'Unexpected error',
+            error: true,
+            message: 'Unexpected error',
             reference: 'LOAN_UNKNOWN_ERROR',
           },
         },

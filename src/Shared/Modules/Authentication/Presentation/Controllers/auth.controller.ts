@@ -17,7 +17,6 @@ import { Response } from 'express';
 import { Roles } from '../../Infrastructure/Decorators/roles.decorator';
 import { JwtAuthGuard } from '../../Infrastructure/Guards/jwtAuth.guard';
 import { RolesGuard } from '../../Infrastructure/Guards/roles.guard';
-import { error } from 'console';
 
 @Controller('auth')
 export class AuthController {

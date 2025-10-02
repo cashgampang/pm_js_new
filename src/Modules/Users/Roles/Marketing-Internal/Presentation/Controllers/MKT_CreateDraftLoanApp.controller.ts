@@ -38,24 +38,26 @@ export class MKT_CreateDraftLoanApplicationController {
   )
   async createDraft(
     // @CurrentUser('id') marketingId: number,
-    @Body() dto: CreateDraftLoanApplicationDto,
+    @Body() dto: any,
     @UploadedFiles() files: Record<string, Express.Multer.File[]>,
   ) {
+    // parse dulu
+    const payload =
+      typeof dto.payload === 'string' ? JSON.parse(dto.payload) : dto.payload;
+
     console.log('File paths:', files);
-    console.log('Payload:', dto.payload);
-    const marketingId = 1;
+    console.log('Payload parsed:', payload);
+
     try {
+      const marketingId = 1;
+
       if (!Object.values(files).some((arr) => arr && arr.length > 0)) {
         throw new BadRequestException('No files uploaded');
       }
 
-      // parse payload kalau masih string
-      const payload =
-        typeof dto.payload === 'string' ? JSON.parse(dto.payload) : dto.payload;
-
       return this.MKT_CreateDraftLoanAppUseCase.executeCreateDraft(
         marketingId,
-        payload,
+        payload, // <<=== ini harus parsed object
         files,
       );
     } catch (error) {
@@ -79,6 +81,11 @@ export class MKT_CreateDraftLoanApplicationController {
     );
   }
 
+  @Get(':id')
+  async getDraftById(@Param('id') Id: string) {
+    return this.MKT_CreateDraftLoanAppUseCase.renderDraftById(Id);
+  }
+
   @Delete('delete/:id')
   // async (@CurrentUser('id') Id: number) {
   async softDelete(@Param('id') Id: string) {
@@ -96,12 +103,16 @@ export class MKT_CreateDraftLoanApplicationController {
   )
   async updateDraftById(
     @Param('id') Id: string,
-    @Body() updateData: Partial<CreateDraftLoanApplicationDto>,
+    @Body() updateData: any = {}, // biar gampang parsing payload json
     @UploadedFiles() files: Record<string, Express.Multer.File[]>,
   ) {
+    const payload =
+      typeof updateData.payload === 'string'
+        ? JSON.parse(updateData.payload)
+        : updateData.payload;
     return this.MKT_CreateDraftLoanAppUseCase.updateDraftById(
       Id,
-      updateData,
+      payload ?? {},
       files,
     );
   }
