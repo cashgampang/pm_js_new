@@ -104,6 +104,8 @@ export class LoanApplication {
   @Prop({ type: CollateralInternalSchema })
   collateral_internal?: CollateralInternal;
   @Prop({ type: RelativeInternalSchema }) relative_internal?: RelativeInternal;
+  @Prop({ type: Object })
+  uploaded_files?: Record<string, string[]>;
   @Prop({ default: false }) isDeleted: boolean; // flag soft delete
 }
 

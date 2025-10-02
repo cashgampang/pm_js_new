@@ -14,11 +14,6 @@ class ClientInternalDto {
   @IsString() @IsNotEmpty() no_ktp: string;
   @IsString() @IsNotEmpty() no_hp: string;
   @IsEmail() @IsNotEmpty() email: string;
-
-  @IsString() @IsString() foto_ktp?: string;
-  @IsOptional() @IsString() foto_kk?: string;
-  @IsOptional() @IsString() foto_id_card?: string;
-  @IsOptional() @IsString() foto_rekening?: string;
 }
 
 // ================= Address =================
@@ -75,6 +70,14 @@ class RelativeInternalDto {
   @IsOptional() @IsString() no_hp?: string;
 }
 
+// ================= Uploaded Files =================
+class UploadedFilesDto {
+  @IsOptional() @IsString() foto_ktp?: string;
+  @IsOptional() @IsString() foto_kk?: string;
+  @IsOptional() @IsString() foto_id_card?: string;
+  @IsOptional() @IsString() foto_rekening?: string;
+}
+
 export class PayloadDTO {
   @ValidateNested()
   @Type(() => ClientInternalDto)
@@ -115,4 +118,9 @@ export class CreateDraftLoanApplicationDto {
   @ValidateNested()
   @Type(() => PayloadDTO)
   payload: PayloadDTO;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UploadedFilesDto)
+  uploaded_files?: UploadedFilesDto;
 }
