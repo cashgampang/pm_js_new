@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { FamilyInternalService } from '../../Application/Services/family-internal.service';
 import { CreateFamilyDto } from '../../Application/DTOS/dto-Family/create-family-internal.dto';
 import { UpdateFamilyDto } from '../../Application/DTOS/dto-Family/update-family-internal.dto';
-
 import { RolesGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/roles.guard';
 import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/jwtAuth.guard';
 
@@ -21,6 +21,11 @@ export class FamilyInternalController {
     return this.familyService.findById(+id);
   }
 
+  @Get('nasabah/:nasabahId')
+  async findByNasabahId(@Param('nasabahId') nasabahId: number) {
+    return this.familyService.findByNasabahId(+nasabahId);
+  }
+
   @Get()
   async findAll() {
     return this.familyService.findAll();
@@ -28,7 +33,10 @@ export class FamilyInternalController {
 
   @Put(':id')
   async update(@Param('id') id: number, @Body() dto: UpdateFamilyDto) {
-    return this.familyService.update(+id, dto);
+    const transformed = plainToInstance(UpdateFamilyDto, dto, {
+      excludeExtraneousValues: true,
+    });
+    return this.familyService.update(+id, transformed);
   }
 
   @Delete(':id')

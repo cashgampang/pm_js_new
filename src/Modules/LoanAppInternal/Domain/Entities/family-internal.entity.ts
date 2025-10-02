@@ -1,65 +1,55 @@
-// domain/entities/family-internal.entity.ts
-
-import {
-  BekerjaEnum,
-  HubunganEnum,
-} from 'src/Shared/Enums/Internal/Family.enum';
+import { BekerjaEnum, HubunganEnum } from 'src/Shared/Enums/Internal/Family.enum';
 
 export class FamilyInternal {
   constructor(
-    // === Immutable ===
-    public readonly nasabahId: number, // ID of ClientInternal
+    public readonly nasabah_id: number,
     public readonly hubungan: HubunganEnum,
     public readonly nama: string,
     public readonly bekerja: BekerjaEnum,
     public readonly id?: number,
-    public readonly createdAt?: Date,
-    public readonly deletedAt?: Date | null,
-
-    // === Mutable ===
-    public namaPerusahaan?: string,
+    public readonly created_at?: Date,
+    public readonly deleted_at?: Date,
+    public nama_perusahaan?: string,
     public jabatan?: string,
     public penghasilan?: number,
-    public alamatKerja?: string,
-    public noHp?: string,
-    public updatedAt?: Date,
+    public alamat_kerja?: string,
+    public no_hp?: string,
+    public updated_at?: Date,
   ) {}
 
-  // === Business Rules ===
-  public isEmployed(): boolean {
+  public is_employed(): boolean {
     return this.bekerja === BekerjaEnum.YA;
   }
 
-  public hasCompanyInfo(): boolean {
-    return !!this.namaPerusahaan && !!this.jabatan;
+  public has_company_info(): boolean {
+    return !!this.nama_perusahaan && !!this.jabatan;
   }
 
-  public hasIncome(): boolean {
-    return this.isEmployed() && (this.penghasilan ?? 0) > 0;
+  public has_income(): boolean {
+    return this.is_employed() && (this.penghasilan ?? 0) > 0;
   }
 
-  public isEmergencyContact(): boolean {
-    return this.hubungan === HubunganEnum.SUAMI ||
-           this.hubungan === HubunganEnum.ISTRI ||
-           this.hubungan === HubunganEnum.ORANG_TUA;
+  public is_emergency_contact(): boolean {
+    return [HubunganEnum.SUAMI, HubunganEnum.ISTRI, HubunganEnum.ORANG_TUA].includes(this.hubungan);
   }
 
-  // === Update Methods ===
-  public updateJobInfo(
-    namaPerusahaan?: string,
+  public update_job_info(
+    nama_perusahaan?: string,
     jabatan?: string,
     penghasilan?: number,
-    alamatKerja?: string,
+    alamat_kerja?: string,
   ): void {
-    this.namaPerusahaan = namaPerusahaan;
-    this.jabatan = jabatan;
-    this.penghasilan = penghasilan;
-    this.alamatKerja = alamatKerja;
-    this.updatedAt = new Date();
+    if (nama_perusahaan !== undefined) this.nama_perusahaan = nama_perusahaan;
+    if (jabatan !== undefined) this.jabatan = jabatan;
+    if (penghasilan !== undefined) this.penghasilan = penghasilan;
+    if (alamat_kerja !== undefined) this.alamat_kerja = alamat_kerja;
+
+    this.updated_at = new Date();
   }
 
-  public updateContact(noHp: string): void {
-    this.noHp = noHp;
-    this.updatedAt = new Date();
+  public update_contact(no_hp?: string): void {
+    if (no_hp !== undefined) this.no_hp = no_hp;
+    this.updated_at = new Date();
   }
 }
+

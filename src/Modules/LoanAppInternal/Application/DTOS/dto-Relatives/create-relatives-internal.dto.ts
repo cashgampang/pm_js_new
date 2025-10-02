@@ -1,24 +1,17 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsPhoneNumber,
-  IsNumber,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
 import { KerabatKerjaEnum } from 'src/Shared/Enums/Internal/Relative.enum';
 
-export class CreateRelativeInternalDto {
+export class CreateRelativesInternalDto {
   @IsNumber()
   @IsNotEmpty()
-  nasabah_id: number;
+  nasabahId: number; // ID saja, bukan entity
 
   @IsEnum(KerabatKerjaEnum)
-  kerabat_kerja: KerabatKerjaEnum;
+  kerabatKerja: KerabatKerjaEnum;
 
-  @IsOptional()
   @IsString()
-  nama?: string;
+  @IsNotEmpty()
+  nama: string;
 
   @IsOptional()
   @IsString()
@@ -26,14 +19,25 @@ export class CreateRelativeInternalDto {
 
   @IsOptional()
   @IsString()
-  @IsPhoneNumber('ID') // Optional: validasi format no HP Indonesia
-  no_hp?: string;
+  noHp?: string;
 
   @IsOptional()
   @IsString()
-  status_hubungan?: string;
+  statusHubungan?: string;
 
   @IsOptional()
   @IsString()
-  nama_perusahaan?: string;
+  namaPerusahaan?: string;
+
+  @IsOptional()
+  @IsString()
+  jabatan?: string;
+
+  @IsOptional()
+  @IsNumber()
+  penghasilan?: number;
+
+  @IsOptional()
+  @IsString()
+  alamatKerja?: string;
 }

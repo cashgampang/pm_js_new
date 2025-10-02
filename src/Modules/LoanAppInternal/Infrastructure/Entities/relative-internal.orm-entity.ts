@@ -1,51 +1,49 @@
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import { ClientInternal_ORM_Entity } from './client-internal.orm-entity';
-import { KerabatKerjaEnum } from 'src/Shared/Enums/Internal/Relative.enum';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
-  JoinColumn,
-} from 'typeorm';
+import { KerabatKerjaEnum } from '../../../../Shared/Enums/Internal/Relative.enum';
 
 @Entity('relative_internal')
 export class RelativeInternal_ORM_Entity {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => ClientInternal_ORM_Entity, (clientInternal) => clientInternal.id, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'nasabah_id', foreignKeyConstraintName: 'FK_ClientInternalID_at_RelativesInternal' })
-  nasabah_id: ClientInternal_ORM_Entity;
+  @ManyToOne(() => ClientInternal_ORM_Entity, client => client.relatives, { nullable: false })
+  @JoinColumn({ name: 'nasabah_id' })
+  nasabah: ClientInternal_ORM_Entity;
 
   @Column({ type: 'enum', enum: KerabatKerjaEnum })
   kerabat_kerja: KerabatKerjaEnum;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  nama?: string;
+  @Column()
+  nama: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  alamat?: string;
+  @Column()
+  alamat: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  no_hp?: string;
+  @Column()
+  no_hp: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  status_hubungan?: string;
+  @Column()
+  status_hubungan: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ nullable: true })
   nama_perusahaan?: string;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: true })
-  created_at?: Date;
+  @Column({ nullable: true })
+  jabatan?: string;
 
-  @UpdateDateColumn({ type: 'timestamp', nullable: true })
-  updated_at?: Date;
+  @Column({ nullable: true })
+  penghasilan?: string; // string
 
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deleted_at?: Date | null;
+  @Column({ nullable: true })
+  alamat_kerja?: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deleted_at?: Date;
 }
