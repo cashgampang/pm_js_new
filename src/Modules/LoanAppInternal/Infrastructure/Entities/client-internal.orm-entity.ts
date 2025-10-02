@@ -1,11 +1,3 @@
-import { AddressInternal_ORM_Entity } from './address-internal.orm-entity';
-import { LoanApplicationInternal_ORM_Entity } from './loan-application-internal.orm-entity';
-import { CollateralInternal_ORM_Entity } from './collateral-internal.orm-entity';
-import { FamilyInternal_ORM_Entity } from './family-internal.orm-entity';
-import { JobInternal_ORM_Entity } from './job-internal.orm-entity';
-import { RelativeInternal_ORM_Entity } from './relative-internal.orm-entity';
-import { Users_ORM_Entity } from 'src/Modules/Users/Infrastructure/Entities/users.orm-entity';
-import { GENDER, MARRIAGE_STATUS } from 'src/Shared/Enums/Internal/Clients.enum';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -15,47 +7,42 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
+import { Users_ORM_Entity } from 'src/Modules/Users/Infrastructure/Entities/users.orm-entity';
+import { GENDER, MARRIAGE_STATUS } from 'src/Shared/Enums/Internal/Clients.enum';
 
 @Entity('client_internal')
 export class ClientInternal_ORM_Entity {
   @PrimaryGeneratedColumn('increment')
-  id: number;
+  id!: number;
 
-  @ManyToOne(() => Users_ORM_Entity, (user) => user.clientInternals, {
-    onDelete: 'CASCADE',
-    eager: true,
-  })
-  @JoinColumn({
-    name: 'marketing_id',
-    foreignKeyConstraintName: 'FK_MarketingID_at_ClientInternal',
-  }) // refer to kolom FK di atas
-  marketing: Users_ORM_Entity;
+  @ManyToOne(() => Users_ORM_Entity, user => user.clientInternals, { onDelete: 'CASCADE', eager: true })
+  @JoinColumn({ name: 'marketing_id' })
+  marketing!: Users_ORM_Entity;
 
   @Column()
-  nama_lengkap: string;
+  nama_lengkap!: string;
 
   @Column()
-  no_ktp: string;
+  no_ktp!: string;
 
   @Column({ type: 'enum', enum: GENDER })
-  jenis_kelamin: GENDER;
+  jenis_kelamin!: GENDER;
 
   @Column()
-  tempat_lahir: string;
+  tempat_lahir!: string;
 
   @Column({ type: 'date' })
-  tanggal_lahir: Date;
+  tanggal_lahir!: Date;
 
   @Column()
-  no_hp: string;
+  no_hp!: string;
+
+  @Column({ type: 'enum', enum: MARRIAGE_STATUS })
+  status_nikah!: MARRIAGE_STATUS;
 
   @Column({ nullable: true })
   email?: string;
-
-  @Column({ type: 'enum', enum: MARRIAGE_STATUS })
-  status_nikah: MARRIAGE_STATUS;
 
   @Column({ nullable: true })
   foto_ktp?: string;
@@ -73,7 +60,7 @@ export class ClientInternal_ORM_Entity {
   no_rekening?: string;
 
   @Column({ type: 'tinyint', default: 0 })
-  enable_edit: boolean;
+  enable_edit!: boolean;
 
   @Column({ nullable: true })
   points?: string;
@@ -86,30 +73,5 @@ export class ClientInternal_ORM_Entity {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleted_at?: Date | null;
-
-  // * CLIENTS (nasabah_id_dalam) RELATIONSHIPS TO ANOTHER ENTITIES
-  @OneToMany(
-    () => AddressInternal_ORM_Entity,
-    (addressInternal) => addressInternal.nasabah_id,
-  )
-  addressInternal: AddressInternal_ORM_Entity[];
-  @OneToMany(
-    () => CollateralInternal_ORM_Entity,
-    (collateralInternal) => collateralInternal.nasabah_id,
-  )
-  collateralInternal: CollateralInternal_ORM_Entity[];
-  @OneToMany(() => FamilyInternal_ORM_Entity, (familyInternal) => familyInternal.nasabah_id)
-  familyInternal: FamilyInternal_ORM_Entity[];
-  @OneToMany(
-    () => RelativeInternal_ORM_Entity,
-    (relativeInternal) => relativeInternal.nasabah_id,
-  )
-  relativeInternal: RelativeInternal_ORM_Entity[];
-  @OneToMany(() => JobInternal_ORM_Entity, (jobInternal) => jobInternal.nasabah_id)
-  jobInternal: JobInternal_ORM_Entity[];
-  @OneToMany(
-    () => LoanApplicationInternal_ORM_Entity,
-    (loanApplicationInternal) => loanApplicationInternal.nasabah_id,
-  )
-  applicationInfoInternal: LoanApplicationInternal_ORM_Entity[];
+  familyInternal: any;
 }

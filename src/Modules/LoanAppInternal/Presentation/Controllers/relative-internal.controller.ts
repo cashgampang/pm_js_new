@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
-import { RelativeInternalService } from '../../Application/Services/relative-internal.entity';
-import { CreateRelativeInternalDto } from '../../Application/DTOS/dto-Relatives/create-relatives-internal.dto';
+import { RelativesInternal } from '../../Application/Services/relative-internal.entity';
+import { CreateRelativesInternalDto } from '../../Application/DTOS/dto-Relatives/create-relatives-internal.dto';
 import { UpdateRelativeInternalDto } from '../../Application/DTOS/dto-Relatives/update-relatives-internal.dto';
 
 import { RolesGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/roles.guard';
@@ -9,10 +9,10 @@ import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/G
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('relative-internal')
 export class RelativeInternalController {
-  constructor(private readonly relativeService: RelativeInternalService) {}
+  constructor(private readonly relativeService: RelativesInternal) {}
 
   @Post()
-  async create(@Body() dto: CreateRelativeInternalDto) {
+  async create(@Body() dto: CreateRelativesInternalDto) {
     return this.relativeService.create(dto);
   }
 

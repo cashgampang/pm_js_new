@@ -1,16 +1,23 @@
-import { FamilyInternal } from "../Entities/family-internal.entity";
+import { FamilyInternal } from '../Entities/family-internal.entity';
 
 export const FAMILY_INTERNAL_REPOSITORY = Symbol('FAMILY_INTERNAL_REPOSITORY');
 
 export interface IFamilyInternalRepository {
-  findById(id: number): Promise<FamilyInternal | null>;
-  findByNasabahId(nasabahId: number): Promise<FamilyInternal[]>;
+  // Ambil semua data family
   findAll(): Promise<FamilyInternal[]>;
-  save(address: FamilyInternal): Promise<FamilyInternal>;
-  update(
-    id: number,
-    address: Partial<FamilyInternal>,
-  ): Promise<FamilyInternal>;
+
+  // Ambil data family berdasarkan ID
+  findById(id: number): Promise<FamilyInternal | null>;
+
+  // Ambil data family berdasarkan nasabah_id
+  findByNasabahId(nasabahId: number): Promise<FamilyInternal[]>;
+
+  // Simpan family baru
+  save(family: FamilyInternal): Promise<FamilyInternal>;
+
+  // Update data family berdasarkan ID
+  update(id: number, family: Partial<FamilyInternal>): Promise<FamilyInternal>;
+
+  // Hapus family berdasarkan ID
   delete(id: number): Promise<void>;
-  // delete(id: number): Promise<void>;
 }

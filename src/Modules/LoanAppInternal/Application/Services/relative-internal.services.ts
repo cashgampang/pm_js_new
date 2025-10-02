@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IRelativesInternalRepository, RELATIVE_INTERNAL_REPOSITORY } from '../../Domain/Repositories/relatives-internal.repository';
 import { RelativesInternal } from '../../Domain/Entities/relative-internal.entity';
-import { CreateRelativeInternalDto } from '../DTOS/dto-Relatives/create-relatives-internal.dto';
+import { CreateRelativesInternalDto } from '../DTOS/dto-Relatives/create-relatives-internal.dto';
 import { UpdateRelativeInternalDto } from '../DTOS/dto-Relatives/update-relatives-internal.dto';
 
 @Injectable()
@@ -11,26 +11,44 @@ export class RelativeInternalService {
     private readonly repo: IRelativesInternalRepository,
   ) {}
 
-  async create(dto: CreateRelativeInternalDto): Promise<RelativesInternal> {
+  async create(dto: CreateRelativesInternalDto): Promise<RelativesInternal> {
     const now = new Date();
-    const address = new RelativesInternal(
-      dto.nasabah_id,
-      dto.kerabat_kerja,
+
+    const relative = new RelativesInternal(
+      dto.nasabahId,
+      dto.kerabatKerja,
       undefined,
       dto.nama,
       dto.alamat,
-      dto.no_hp,
-      dto.status_hubungan,
-      dto.nama_perusahaan,
+      dto.noHp,
+      dto.statusHubungan,
+      dto.namaPerusahaan,
+      dto.jabatan,
+      dto.penghasilan, // pastikan string
+      dto.alamatKerja,
       now,
       now,
       null,
     );
-    return this.repo.save(address);
+
+    return this.repo.save(relative);
   }
 
   async update(id: number, dto: UpdateRelativeInternalDto): Promise<RelativesInternal> {
-    return this.repo.update(id, dto);
+    const partial: Partial<RelativesInternal> = {
+      nama: dto.nama,
+      alamat: dto.alamat,
+      noHp: dto.noHp,
+      statusHubungan: dto.statusHubungan,
+      namaPerusahaan: dto.namaPerusahaan,
+      jabatan: dto.jabatan,
+      penghasilan: dto.penghasilan, // string
+      alamatKerja: dto.alamatKerja,
+      kerabatKerja: dto.kerabatKerja,
+      nasabahId: dto.nasabahId,
+    };
+
+    return this.repo.update(id, partial);
   }
 
   async findById(id: number): Promise<RelativesInternal | null> {

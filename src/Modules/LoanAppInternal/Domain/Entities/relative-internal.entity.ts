@@ -1,9 +1,8 @@
-// src/Modules/LoanAppInternal/Domain/Entities/relative-internal.entity.ts
 import { KerabatKerjaEnum } from 'src/Shared/Enums/Internal/Relative.enum';
 
 export class RelativesInternal {
   constructor(
-    public nasabahId: number, // ID of ClientInternal
+    public nasabahId: number,
     public kerabatKerja: KerabatKerjaEnum,
     public id?: number,
     public nama?: string,
@@ -11,18 +10,19 @@ export class RelativesInternal {
     public noHp?: string,
     public statusHubungan?: string,
     public namaPerusahaan?: string,
+    public jabatan?: string,
+    public penghasilan?: string, // string untuk konsisten dengan ORM
+    public alamatKerja?: string,
     public createdAt?: Date,
     public updatedAt?: Date,
     public deletedAt?: Date | null,
   ) {}
 
-  // Business rule: Check if the relative is considered as 'kerabat kerja' (working relative)
-  public isKerabatKerja(): boolean {
+  isKerabatKerja(): boolean {
     return this.kerabatKerja === KerabatKerjaEnum.YA;
   }
 
-  // Business rule: Check if the relative has a valid contact number
-  public hasValidContact(): boolean {
+  hasValidContact(): boolean {
     return !!this.noHp;
   }
 }
