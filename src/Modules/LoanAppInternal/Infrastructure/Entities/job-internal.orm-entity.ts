@@ -20,7 +20,7 @@ export class JobInternal_ORM_Entity {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'nasabah_id', foreignKeyConstraintName: 'FK_ClientInternalID_at_JobInternal' })
-  nasabah_id: ClientInternal_ORM_Entity;
+  nasabah: ClientInternal_ORM_Entity;
 
   @Column({ type: 'enum', enum: PerusahaanEnum })
   perusahaan: PerusahaanEnum;

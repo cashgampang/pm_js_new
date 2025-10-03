@@ -8,28 +8,28 @@ import {
 export class JobInternal {
   constructor(
     // === Immutable ===
-    public readonly nasabahId: number, // ID of ClientInternal
+    public readonly nasabah: {id: number}, // ID of ClientInternal
     public readonly perusahaan: PerusahaanEnum,
     public readonly divisi: string,
     public readonly golongan: GolonganEnum,
-    public readonly namaAtasan: string,
-    public readonly namaHrd: string,
+    public readonly nama_atasan: string,
+    public readonly nama_hrd: string,
     public readonly absensi: string,
     public readonly id?: number,
-    public readonly createdAt?: Date,
-    public readonly deletedAt?: Date | null,
+    public readonly created_at?: Date,
+    public readonly deleted_at?: Date | null,
 
     // === Mutable ===
     public yayasan?: string,
-    public lamaKerjaBulan?: number,
-    public lamaKerjaTahun?: number,
-    public buktiAbsensi?: string,
-    public updatedAt?: Date,
+    public lama_kerja_bulan?: number,
+    public lama_kerja_tahun?: number,
+    public bukti_absensi?: string,
+    public updated_at?: Date,
   ) {}
 
   // === Business Rules ===
   public totalYearsOfExperience(): number {
-    return (this.lamaKerjaTahun ?? 0) + (this.lamaKerjaBulan ?? 0) / 12;
+    return (this.lama_kerja_tahun ?? 0) + (this.lama_kerja_bulan ?? 0) / 12;
   }
 
   public requiresYayasan(): boolean {
@@ -41,23 +41,23 @@ export class JobInternal {
   }
 
   public hasProofOfAbsensi(): boolean {
-    return !!this.buktiAbsensi;
+    return !!this.bukti_absensi;
   }
 
   // === Update Methods ===
   public updateWorkDuration(tahun: number, bulan: number): void {
-    this.lamaKerjaTahun = tahun;
-    this.lamaKerjaBulan = bulan;
-    this.updatedAt = new Date();
+    this.lama_kerja_tahun = tahun;
+    this.lama_kerja_bulan = bulan;
+    this.updated_at = new Date();
   }
 
   public updateYayasan(yayasan: string): void {
     this.yayasan = yayasan;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   public updateAbsensi(buktiAbsensi: string): void {
-    this.buktiAbsensi = buktiAbsensi;
-    this.updatedAt = new Date();
+    this.bukti_absensi = buktiAbsensi;
+    this.updated_at = new Date();
   }
 }

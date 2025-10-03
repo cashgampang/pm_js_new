@@ -90,7 +90,7 @@ export class ClientInternal_ORM_Entity {
   // * CLIENTS (nasabah_id_dalam) RELATIONSHIPS TO ANOTHER ENTITIES
   @OneToMany(
     () => AddressInternal_ORM_Entity,
-    (addressInternal) => addressInternal.nasabah_id,
+    (addressInternal) => addressInternal.nasabah,
   )
   addressInternal: AddressInternal_ORM_Entity[];
   @OneToMany(
@@ -98,18 +98,18 @@ export class ClientInternal_ORM_Entity {
     (collateralInternal) => collateralInternal.nasabah_id,
   )
   collateralInternal: CollateralInternal_ORM_Entity[];
-  @OneToMany(() => FamilyInternal_ORM_Entity, (familyInternal) => familyInternal.nasabah_id)
+  @OneToMany(() => FamilyInternal_ORM_Entity, (familyInternal) => familyInternal.nasabah)
   familyInternal: FamilyInternal_ORM_Entity[];
   @OneToMany(
     () => RelativeInternal_ORM_Entity,
-    (relativeInternal) => relativeInternal.nasabah_id,
+    (relativeInternal) => relativeInternal.nasabah,
   )
   relativeInternal: RelativeInternal_ORM_Entity[];
-  @OneToMany(() => JobInternal_ORM_Entity, (jobInternal) => jobInternal.nasabah_id)
+  @OneToMany(() => JobInternal_ORM_Entity, (jobInternal) => jobInternal.nasabah)
   jobInternal: JobInternal_ORM_Entity[];
   @OneToMany(
     () => LoanApplicationInternal_ORM_Entity,
-    (loanApplicationInternal) => loanApplicationInternal.nasabah_id,
+    (loanApplicationInternal) => loanApplicationInternal.nasabah,
   )
   applicationInfoInternal: LoanApplicationInternal_ORM_Entity[];
 }

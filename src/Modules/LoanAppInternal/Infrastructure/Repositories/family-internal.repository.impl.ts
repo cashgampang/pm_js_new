@@ -18,7 +18,7 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
 
   private toDomain(orm: FamilyInternal_ORM_Entity): FamilyInternal {
     return new FamilyInternal(
-      orm.nasabah_id!.id,
+      orm.nasabah,
       orm.hubungan,
       orm.nama,
       orm.bekerja,
@@ -41,18 +41,18 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
   ): Partial<FamilyInternal_ORM_Entity> {
     return {
       id: domainEntity.id,
-      nasabah_id: { id: domainEntity.nasabahId } as ClientInternal_ORM_Entity,
+      nasabah: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
       hubungan: domainEntity.hubungan,
       nama: domainEntity.nama,
       bekerja: domainEntity.bekerja,
-      nama_perusahaan: domainEntity.namaPerusahaan,
+      nama_perusahaan: domainEntity.nama_perusahaan,
       jabatan: domainEntity.jabatan,
       penghasilan: domainEntity.penghasilan,
-      alamat_kerja: domainEntity.alamatKerja,
-      no_hp: domainEntity.noHp,
-      created_at: domainEntity.createdAt,
-      updated_at: domainEntity.updatedAt,
-      deleted_at: domainEntity.deletedAt,
+      alamat_kerja: domainEntity.alamat_kerja,
+      no_hp: domainEntity.no_hp,
+      created_at: domainEntity.created_at,
+      updated_at: domainEntity.updated_at,
+      deleted_at: domainEntity.deleted_at,
     };
   }
 
@@ -63,22 +63,22 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
   ): Partial<FamilyInternal_ORM_Entity> {
     const ormData: Partial<FamilyInternal_ORM_Entity> = {};
 
-    if (partial.nasabahId)
-      ormData.nasabah_id! = {
-        id: partial.nasabahId,
+    if (partial.nasabah)
+      ormData.nasabah! = {
+        id: partial.nasabah.id,
       } as ClientInternal_ORM_Entity;
     if (partial.hubungan) ormData.hubungan = partial.hubungan;
     if (partial.nama) ormData.nama = partial.nama;
     if (partial.bekerja) ormData.bekerja = partial.bekerja;
-    if (partial.namaPerusahaan)
-      ormData.nama_perusahaan = partial.namaPerusahaan;
+    if (partial.nama_perusahaan)
+      ormData.nama_perusahaan = partial.nama_perusahaan;
     if (partial.jabatan) ormData.jabatan = partial.jabatan;
     if (partial.penghasilan) ormData.penghasilan = partial.penghasilan;
-    if (partial.alamatKerja) ormData.alamat_kerja = partial.alamatKerja;
-    if (partial.noHp) ormData.no_hp = partial.noHp;
-    if (partial.createdAt) ormData.created_at = partial.createdAt;
-    if (partial.updatedAt) ormData.updated_at = partial.updatedAt;
-    if (partial.deletedAt) ormData.deleted_at = partial.deletedAt;
+    if (partial.alamat_kerja) ormData.alamat_kerja = partial.alamat_kerja;
+    if (partial.no_hp) ormData.no_hp = partial.no_hp;
+    if (partial.created_at) ormData.created_at = partial.created_at;
+    if (partial.updated_at) ormData.updated_at = partial.updated_at;
+    if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
 
     return ormData;
   }
@@ -92,7 +92,7 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
 
   async findByNasabahId(nasabahId: number): Promise<FamilyInternal[]> {
     const ormEntities = await this.ormRepository.find({
-      where: { nasabah_id: { id: nasabahId } },
+      where: { nasabah: { id: nasabahId } },
     });
     return ormEntities.map(this.toDomain);
   }
@@ -111,7 +111,6 @@ export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
 
     const updated = await this.ormRepository.findOne({
       where: { id },
-      relations: ['nasabah_id'],
     });
     if (!updated) throw new Error('Family not found');
     return this.toDomain(updated);

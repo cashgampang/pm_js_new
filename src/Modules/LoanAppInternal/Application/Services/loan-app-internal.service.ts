@@ -15,7 +15,7 @@ export class LoanApplicationInternalService {
   async create(dto: CreateLoanApplicationInternalDto): Promise<LoanApplicationInternal> {
     const now = new Date();
     const address = new LoanApplicationInternal(
-      dto.nasabah_id,
+      {id: dto.nasabah_id},
       dto.status_pinjaman ?? StatusPinjamanEnum.BARU,
       dto.nominal_pinjaman,
       dto.tenor,

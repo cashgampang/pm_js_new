@@ -20,7 +20,7 @@ export class RelativeInternalRepositoryImpl
 
   private toDomain(orm: RelativeInternal_ORM_Entity): RelativesInternal {
     return new RelativesInternal(
-      orm.nasabah_id!.id,
+      orm.nasabah,
       orm.kerabat_kerja,
       orm.id,
       orm.nama,
@@ -41,16 +41,16 @@ export class RelativeInternalRepositoryImpl
   ): Partial<RelativeInternal_ORM_Entity> {
     return {
       id: domainEntity.id,
-      nasabah_id: { id: domainEntity.nasabahId } as ClientInternal_ORM_Entity,
-      kerabat_kerja: domainEntity.kerabatKerja,
+      nasabah: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
+      kerabat_kerja: domainEntity.kerabat_kerja,
       nama: domainEntity.nama,
       alamat: domainEntity.alamat,
-      no_hp: domainEntity.noHp,
-      status_hubungan: domainEntity.statusHubungan,
-      nama_perusahaan: domainEntity.namaPerusahaan,
-      created_at: domainEntity.createdAt,
-      updated_at: domainEntity.updatedAt,
-      deleted_at: domainEntity.deletedAt,
+      no_hp: domainEntity.no_hp,
+      status_hubungan: domainEntity.status_hubungan,
+      nama_perusahaan: domainEntity.nama_perusahaan,
+      created_at: domainEntity.created_at,
+      updated_at: domainEntity.updated_at,
+      deleted_at: domainEntity.deleted_at,
     };
   }
 
@@ -61,22 +61,22 @@ export class RelativeInternalRepositoryImpl
   ): Partial<RelativeInternal_ORM_Entity> {
     const ormData: Partial<RelativeInternal_ORM_Entity> = {};
 
-    if (partial.nasabahId)
-      ormData.nasabah_id! = {
-        id: partial.nasabahId,
+    if (partial.nasabah)
+      ormData.nasabah! = {
+        id: partial.nasabah.id,
       } as ClientInternal_ORM_Entity;
-    if (partial.kerabatKerja) ormData.kerabat_kerja = partial.kerabatKerja;
+    if (partial.kerabat_kerja) ormData.kerabat_kerja = partial.kerabat_kerja;
     if (partial.id) ormData.id = partial.id;
     if (partial.nama) ormData.nama = partial.nama;
     if (partial.alamat) ormData.alamat = partial.alamat;
-    if (partial.noHp) ormData.no_hp = partial.noHp;
-    if (partial.statusHubungan)
-      ormData.status_hubungan = partial.statusHubungan;
-    if (partial.namaPerusahaan)
-      ormData.nama_perusahaan = partial.namaPerusahaan;
-    if (partial.createdAt) ormData.created_at = partial.createdAt;
-    if (partial.updatedAt) ormData.updated_at = partial.updatedAt;
-    if (partial.deletedAt) ormData.deleted_at = partial.deletedAt;
+    if (partial.no_hp) ormData.no_hp = partial.no_hp;
+    if (partial.status_hubungan)
+      ormData.status_hubungan = partial.status_hubungan;
+    if (partial.nama_perusahaan)
+      ormData.nama_perusahaan = partial.nama_perusahaan;
+    if (partial.created_at) ormData.created_at = partial.created_at;
+    if (partial.updated_at) ormData.updated_at = partial.updated_at;
+    if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
 
     return ormData;
   }
@@ -90,7 +90,7 @@ export class RelativeInternalRepositoryImpl
 
   async findByNasabahId(nasabahId: number): Promise<RelativesInternal[]> {
     const ormEntities = await this.ormRepository.find({
-      where: { nasabah_id: { id: nasabahId } },
+      where: { nasabah: { id: nasabahId } },
     });
     return ormEntities.map(this.toDomain);
   }
@@ -108,7 +108,6 @@ export class RelativeInternalRepositoryImpl
     await this.ormRepository.update(id, this.toOrmPartial(relativeData));
     const updated = await this.ormRepository.findOne({
       where: { id },
-      relations: ['nasabah_id'],
     });
     if (!updated) throw new Error('Job not found');
     return this.toDomain(updated);

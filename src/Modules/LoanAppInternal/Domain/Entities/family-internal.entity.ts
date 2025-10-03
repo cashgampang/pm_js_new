@@ -8,21 +8,21 @@ import {
 export class FamilyInternal {
   constructor(
     // === Immutable ===
-    public readonly nasabahId: number, // ID of ClientInternal
+    public readonly nasabah: {id: number}, // ID of ClientInternal
     public readonly hubungan: HubunganEnum,
     public readonly nama: string,
     public readonly bekerja: BekerjaEnum,
     public readonly id?: number,
-    public readonly createdAt?: Date,
-    public readonly deletedAt?: Date | null,
+    public readonly created_at?: Date,
+    public readonly deleted_at?: Date | null,
 
     // === Mutable ===
-    public namaPerusahaan?: string,
+    public nama_perusahaan?: string,
     public jabatan?: string,
     public penghasilan?: number,
-    public alamatKerja?: string,
-    public noHp?: string,
-    public updatedAt?: Date,
+    public alamat_kerja?: string,
+    public no_hp?: string,
+    public updated_at?: Date,
   ) {}
 
   // === Business Rules ===
@@ -31,7 +31,7 @@ export class FamilyInternal {
   }
 
   public hasCompanyInfo(): boolean {
-    return !!this.namaPerusahaan && !!this.jabatan;
+    return !!this.nama_perusahaan && !!this.jabatan;
   }
 
   public hasIncome(): boolean {
@@ -46,20 +46,20 @@ export class FamilyInternal {
 
   // === Update Methods ===
   public updateJobInfo(
-    namaPerusahaan?: string,
+    nama_perusahaan?: string,
     jabatan?: string,
     penghasilan?: number,
-    alamatKerja?: string,
+    alamat_kerja?: string,
   ): void {
-    this.namaPerusahaan = namaPerusahaan;
+    this.nama_perusahaan = nama_perusahaan;
     this.jabatan = jabatan;
     this.penghasilan = penghasilan;
-    this.alamatKerja = alamatKerja;
-    this.updatedAt = new Date();
+    this.alamat_kerja = alamat_kerja;
+    this.updated_at = new Date();
   }
 
   public updateContact(noHp: string): void {
-    this.noHp = noHp;
-    this.updatedAt = new Date();
+    this.no_hp = noHp;
+    this.updated_at = new Date();
   }
 }

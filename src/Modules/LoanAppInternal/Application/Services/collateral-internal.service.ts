@@ -17,7 +17,7 @@ export class CollateralInternalService {
   async create(dto: CreateCollateralDto): Promise<CollateralInternal> {
     const now = new Date();
     const address = new CollateralInternal(
-      dto.nasabah_id,
+      {id: dto.nasabah_id},
       dto.jaminan_hrd,
       dto.jaminan_cg,
       dto.penjamin,

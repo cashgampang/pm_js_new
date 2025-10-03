@@ -16,13 +16,13 @@ export class ClientInternalService {
 
   async create(dto: CreateClientInternalDto): Promise<ClientInternal> {
     const now = new Date();
-    const address = new ClientInternal(
-      dto.marketing_id,
-      dto.nama_lengkap, // namaLengkap
-      dto.no_ktp, // noKtp
-      dto.jenis_kelamin, // jenisKelamin
-      dto.tempat_lahir, // tempatLahir
-      new Date(dto.tanggal_lahir), // ✅ convert string → Date
+    const client_internal = new ClientInternal(
+      {id: dto.marketing_id},
+      dto.nama_lengkap, 
+      dto.no_ktp,
+      dto.jenis_kelamin, 
+      dto.tempat_lahir, 
+      new Date(dto.tanggal_lahir), 
       dto.no_hp, // noHp
       dto.status_nikah,
       undefined, // id
@@ -38,7 +38,7 @@ export class ClientInternalService {
       now, // updatedAt (opsional, bisa di-set otomatis di repo)
       null, // deletedAt (opsional, bisa di-set otomatis di repo)
     );
-    return this.repo.save(address);
+    return this.repo.save(client_internal);
   }
 
   async update(

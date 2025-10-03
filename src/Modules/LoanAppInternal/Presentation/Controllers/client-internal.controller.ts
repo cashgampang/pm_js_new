@@ -35,6 +35,11 @@ export class ClientInternalController {
 
   @Delete(':id')
   async delete(@Param('id') id: number) {
-    return this.clientInternal.delete(+id);
+    const result = await this.clientInternal.delete(+id);
+
+    return {
+      eror: " Fasle",
+      message: "data keapus oi"
+    }
   }
 }

@@ -80,9 +80,10 @@ export class MKT_UpdateLoanApplicationUseCase {
           collateral_internal,
           relative_internal,
         } = dto;
-
+          
         // 1. Ambil Client
         const customer = await this.clientRepo.findById(clientId);
+        console.log("ini customer ngtntot:", customer)
         if (!customer) throw new BadRequestException('Client tidak ditemukan');
         console.log('I know there things i should know >>>>>',customer);
 
@@ -90,60 +91,60 @@ export class MKT_UpdateLoanApplicationUseCase {
         const filePaths = files
           ? await this.fileStorage.saveFiles(
               customer.id!,
-              customer.namaLengkap,
+              customer.nama_lengkap,
               files,
             )
           : {};
 
         // 3. Partial update field Client
-        customer.namaLengkap =
-          client_internal?.nama_lengkap ?? customer.namaLengkap;
-        customer.noKtp = client_internal?.no_ktp ?? customer.noKtp;
-        customer.jenisKelamin =
-          client_internal?.jenis_kelamin ?? customer.jenisKelamin;
-        customer.tempatLahir =
-          client_internal?.tempat_lahir ?? customer.tempatLahir;
-        customer.tanggalLahir = client_internal?.tanggal_lahir
+        customer.nama_lengkap =
+          client_internal?.nama_lengkap ?? customer.nama_lengkap;
+        customer.no_ktp = client_internal?.no_ktp ?? customer.no_ktp;
+        customer.jenis_kelamin =
+          client_internal?.jenis_kelamin ?? customer.jenis_kelamin;
+        customer.tempat_lahir =
+          client_internal?.tempat_lahir ?? customer.tempat_lahir;
+        customer.tanggal_lahir = client_internal?.tanggal_lahir
           ? new Date(client_internal.tanggal_lahir)
-          : customer.tanggalLahir;
-        customer.noHp = client_internal?.no_hp ?? customer.noHp;
-        customer.statusNikah =
-          client_internal?.status_nikah ?? customer.statusNikah;
+          : customer.tanggal_lahir;
+        customer.no_hp = client_internal?.no_hp ?? customer.no_hp;
+        customer.status_nikah =
+          client_internal?.status_nikah ?? customer.status_nikah;
         customer.email = client_internal?.email ?? customer.email;
-        customer.fotoKtp =
+        customer.foto_ktp =
           filePaths['foto_ktp']?.[0] ??
           client_internal?.foto_ktp ??
-          customer.fotoKtp;
-        customer.fotoKk =
+          customer.foto_ktp;
+        customer.foto_kk =
           filePaths['foto_kk']?.[0] ??
           client_internal?.foto_kk ??
-          customer.fotoKk;
-        customer.fotoIdCard =
+          customer.foto_kk;
+        customer.foto_id_card =
           filePaths['foto_id_card']?.[0] ??
           client_internal?.foto_id_card ??
-          customer.fotoIdCard;
-        customer.fotoRekening =
+          customer.foto_id_card;
+        customer.foto_rekening =
           filePaths['foto_rekening']?.[0] ??
           client_internal?.foto_rekening ??
-          customer.fotoRekening;
-        customer.updatedAt = now;
+          customer.foto_rekening;
+        customer.updated_at = now;
 
         await this.clientRepo.save(customer);
 
         // 4. Partial update Address
         if (address_internal) {
           await this.addressRepo.update(customer.id!, {
-            alamatKtp: address_internal.alamat_ktp,
+            alamat_ktp: address_internal.alamat_ktp,
             kelurahan: address_internal.kelurahan,
-            rtRw: address_internal.rt_rw,
+            rt_rw: address_internal.rt_rw,
             kecamatan: address_internal.kecamatan,
             kota: address_internal.kota,
             provinsi: address_internal.provinsi,
             domisili: address_internal.domisili,
-            statusRumahKtp: address_internal.status_rumah_ktp,
-            statusRumah: address_internal.status_rumah,
-            alamatLengkap: address_internal.alamat_lengkap,
-            updatedAt: now,
+            status_rumah_ktp: address_internal.status_rumah_ktp,
+            status_rumah: address_internal.status_rumah,
+            alamat_lengkap: address_internal.alamat_lengkap,
+            updated_at: now,
           });
         }
 
@@ -153,12 +154,12 @@ export class MKT_UpdateLoanApplicationUseCase {
             hubungan: family_internal.hubungan,
             nama: family_internal.nama,
             bekerja: family_internal.bekerja,
-            namaPerusahaan: family_internal.nama_perusahaan,
+            nama_perusahaan: family_internal.nama_perusahaan,
             jabatan: family_internal.jabatan,
             penghasilan: family_internal.penghasilan,
-            alamatKerja: family_internal.alamat_kerja,
-            noHp: family_internal.no_hp,
-            updatedAt: now,
+            alamat_kerja: family_internal.alamat_kerja,
+            no_hp: family_internal.no_hp,
+            updated_at: now,
           });
         }
 
@@ -167,15 +168,15 @@ export class MKT_UpdateLoanApplicationUseCase {
           await this.jobRepo.update(customer.id!, {
             perusahaan: job_internal.perusahaan,
             divisi: job_internal.divisi,
-            lamaKerjaTahun: job_internal.lama_kerja_tahun,
-            lamaKerjaBulan: job_internal.lama_kerja_bulan,
+            lama_kerja_tahun: job_internal.lama_kerja_tahun,
+            lama_kerja_bulan: job_internal.lama_kerja_bulan,
             golongan: job_internal.golongan,
             yayasan: job_internal.yayasan,
-            namaAtasan: job_internal.nama_atasan,
-            namaHrd: job_internal.nama_hrd,
+            nama_atasan: job_internal.nama_atasan,
+            nama_hrd: job_internal.nama_hrd,
             absensi: job_internal.absensi,
-            buktiAbsensi: job_internal.bukti_absensi,
-            updatedAt: now,
+            bukti_absensi: job_internal.bukti_absensi,
+            updated_at: now,
           });
         } 
 
@@ -185,18 +186,18 @@ export class MKT_UpdateLoanApplicationUseCase {
           const loanApp = loanApps[0]; // asumsi ada 1 loan application
           if (loanApp) {
             await this.loanAppRepo.update(loanApp.id!, {
-              statusPinjaman: loan_application_internal.status_pinjaman,
-              pinjamanKe: loan_application_internal.pinjaman_ke,
-              nominalPinjaman: loan_application_internal.nominal_pinjaman,
+              status_pinjaman: loan_application_internal.status_pinjaman,
+              pinjaman_ke: loan_application_internal.pinjaman_ke,
+              nominal_pinjaman: loan_application_internal.nominal_pinjaman,
               tenor: loan_application_internal.tenor,
               keperluan: loan_application_internal.keperluan,
               status: loan_application_internal.status,
-              riwayatNominal: loan_application_internal.riwayat_nominal,
-              sisaPinjaman: loan_application_internal.sisa_pinjaman,
+              riwayat_nominal: loan_application_internal.riwayat_nominal,
+              sisa_pinjaman: loan_application_internal.sisa_pinjaman,
               notes: loan_application_internal.notes,
-              isBanding: loan_application_internal.is_banding,
-              alasanBanding: loan_application_internal.alasan_banding,
-              updatedAt: now,
+              is_banding: loan_application_internal.is_banding,
+              alasan_banding: loan_application_internal.alasan_banding,
+              updated_at: now,
             });
           }
         }
@@ -204,35 +205,35 @@ export class MKT_UpdateLoanApplicationUseCase {
         // 8. Partial update Collateral
         if (collateral_internal) {
           await this.collateralRepo.update(customer.id!, {
-            jaminanHrd: collateral_internal.jaminan_hrd,
-            jaminanCg: collateral_internal.jaminan_cg,
+            jaminan_hrd: collateral_internal.jaminan_hrd,
+            jaminan_cg: collateral_internal.jaminan_cg,
             penjamin: collateral_internal.penjamin,
-            namaPenjamin: collateral_internal.nama_penjamin,
-            lamaKerjaPenjamin: collateral_internal.lama_kerja_penjamin,
+            nama_penjamin: collateral_internal.nama_penjamin,
+            lama_kerja_penjamin: collateral_internal.lama_kerja_penjamin,
             bagian: collateral_internal.bagian,
             absensi: collateral_internal.absensi,
-            riwayatPinjamPenjamin: collateral_internal.riwayat_pinjam_penjamin,
-            riwayatNominalPenjamin:
+            riwayat_pinjam_penjamin: collateral_internal.riwayat_pinjam_penjamin,
+            riwayat_nominal_penjamin:
               collateral_internal.riwayat_nominal_penjamin,
-            riwayatTenorPenjamin: collateral_internal.riwayat_tenor_penjamin,
-            sisaPinjamanPenjamin: collateral_internal.sisa_pinjaman_penjamin,
-            jaminanCgPenjamin: collateral_internal.jaminan_cg_penjamin,
-            statusHubunganPenjamin:
+            riwayat_tenor_penjamin: collateral_internal.riwayat_tenor_penjamin,
+            sisa_pinjaman_penjamin: collateral_internal.sisa_pinjaman_penjamin,
+            jaminan_cg_penjamin: collateral_internal.jaminan_cg_penjamin,
+            status_hubungan_penjamin:
               collateral_internal.status_hubungan_penjamin,
-            updatedAt: now,
+            updated_at: now,
           });
         }
 
         // 9. Partial update Relative
         if (relative_internal) {
           await this.relativeRepo.update(customer.id!, {
-            kerabatKerja: relative_internal.kerabat_kerja,
+            kerabat_kerja: relative_internal.kerabat_kerja,
             nama: relative_internal.nama,
             alamat: relative_internal.alamat,
-            noHp: relative_internal.no_hp,
-            statusHubungan: relative_internal.status_hubungan,
-            namaPerusahaan: relative_internal.nama_perusahaan,
-            updatedAt: now,
+            no_hp: relative_internal.no_hp,
+            status_hubungan: relative_internal.status_hubungan,
+            nama_perusahaan: relative_internal.nama_perusahaan,
+            updated_at: now,
           });
         }
 

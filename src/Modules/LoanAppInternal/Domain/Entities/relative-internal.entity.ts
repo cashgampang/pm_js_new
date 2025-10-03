@@ -3,26 +3,26 @@ import { KerabatKerjaEnum } from 'src/Shared/Enums/Internal/Relative.enum';
 
 export class RelativesInternal {
   constructor(
-    public nasabahId: number, // ID of ClientInternal
-    public kerabatKerja: KerabatKerjaEnum,
+    public nasabah: {id: number}, // ID of ClientInternal
+    public kerabat_kerja: KerabatKerjaEnum,
     public id?: number,
     public nama?: string,
     public alamat?: string,
-    public noHp?: string,
-    public statusHubungan?: string,
-    public namaPerusahaan?: string,
-    public createdAt?: Date,
-    public updatedAt?: Date,
-    public deletedAt?: Date | null,
+    public no_hp?: string,
+    public status_hubungan?: string,
+    public nama_perusahaan?: string,
+    public created_at?: Date,
+    public updated_at?: Date,
+    public deleted_at?: Date | null,
   ) {}
 
   // Business rule: Check if the relative is considered as 'kerabat kerja' (working relative)
   public isKerabatKerja(): boolean {
-    return this.kerabatKerja === KerabatKerjaEnum.YA;
+    return this.kerabat_kerja === KerabatKerjaEnum.YA;
   }
 
   // Business rule: Check if the relative has a valid contact number
   public hasValidContact(): boolean {
-    return !!this.noHp;
+    return !!this.no_hp;
   }
 }

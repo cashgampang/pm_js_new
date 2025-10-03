@@ -14,7 +14,7 @@ export class RelativeInternalService {
   async create(dto: CreateRelativeInternalDto): Promise<RelativesInternal> {
     const now = new Date();
     const address = new RelativesInternal(
-      dto.nasabah_id,
+      {id: dto.nasabah_id},
       dto.kerabat_kerja,
       undefined,
       dto.nama,

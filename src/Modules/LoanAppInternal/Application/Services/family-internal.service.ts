@@ -17,7 +17,7 @@ export class FamilyInternalService {
   async create(dto: CreateFamilyDto): Promise<FamilyInternal> {
     const now = new Date();
     const address = new FamilyInternal(
-      dto.nasabah_id,
+      {id: dto.nasabah_id},
       dto.hubungan,
       dto.nama,
       dto.bekerja,

@@ -17,9 +17,9 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
   //? All Transactions that using for get datas
 
   private toDomain(orm: JobInternal_ORM_Entity): JobInternal {
-    console.log('orm > : ', orm.nasabah_id?.id);
+    console.log('orm > : ', orm.nasabah?.id);
     return new JobInternal(
-      orm.nasabah_id!.id,
+      orm.nasabah,
       orm.perusahaan,
       orm.divisi,
       orm.golongan,
@@ -40,54 +40,55 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
   //? All Transactions that using for Create datas
 
   private toOrm(domainEntity: JobInternal): Partial<JobInternal_ORM_Entity> {
-    return {
-      id: domainEntity.id,
-      nasabah_id: { id: domainEntity.nasabahId } as ClientInternal_ORM_Entity,
-      perusahaan: domainEntity.perusahaan,
-      divisi: domainEntity.divisi,
-      golongan: domainEntity.golongan,
-      nama_atasan: domainEntity.namaAtasan,
-      nama_hrd: domainEntity.namaHrd,
-      absensi: domainEntity.absensi,
-      yayasan: domainEntity.yayasan,
-      lama_kerja_bulan: domainEntity.lamaKerjaBulan,
-      lama_kerja_tahun: domainEntity.lamaKerjaTahun,
-      bukti_absensi: domainEntity.buktiAbsensi,
-      created_at: domainEntity.createdAt,
-      updated_at: domainEntity.updatedAt,
-      deleted_at: domainEntity.deletedAt,
-    };
-  }
+  return {
+    id: domainEntity.id,
+    nasabah: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
+    perusahaan: domainEntity.perusahaan,
+    divisi: domainEntity.divisi,
+    golongan: domainEntity.golongan,
+    nama_atasan: domainEntity.nama_atasan,
+    nama_hrd: domainEntity.nama_hrd,
+    absensi: domainEntity.absensi,
+    yayasan: domainEntity.yayasan,
+    lama_kerja_bulan: domainEntity.lama_kerja_bulan,
+    lama_kerja_tahun: domainEntity.lama_kerja_tahun,
+    bukti_absensi: domainEntity.bukti_absensi,
+    created_at: domainEntity.created_at,
+    updated_at: domainEntity.updated_at,
+    deleted_at: domainEntity.deleted_at,
+  };
+}
 
-  //? All Transactions that using for Partial Update like PATCH or Delete
+//? All Transactions that using for Partial Update like PATCH or Delete
 
-  private toOrmPartial(
-    partial: Partial<JobInternal>,
-  ): Partial<JobInternal_ORM_Entity> {
-    const ormData: Partial<JobInternal_ORM_Entity> = {};
+private toOrmPartial(
+  partial: Partial<JobInternal>,
+): Partial<JobInternal_ORM_Entity> {
+  const ormData: Partial<JobInternal_ORM_Entity> = {};
 
-    if (partial.nasabahId)
-      ormData.nasabah_id! = {
-        id: partial.nasabahId,
-      } as ClientInternal_ORM_Entity;
-    if (partial.perusahaan) ormData.perusahaan = partial.perusahaan;
-    if (partial.divisi) ormData.divisi = partial.divisi;
-    if (partial.golongan) ormData.golongan = partial.golongan;
-    if (partial.namaAtasan) ormData.nama_atasan = partial.namaAtasan;
-    if (partial.namaHrd) ormData.nama_hrd = partial.namaHrd;
-    if (partial.absensi) ormData.absensi = partial.absensi;
-    if (partial.yayasan) ormData.yayasan = partial.yayasan;
-    if (partial.lamaKerjaBulan)
-      ormData.lama_kerja_bulan = partial.lamaKerjaBulan;
-    if (partial.lamaKerjaTahun)
-      ormData.lama_kerja_tahun = partial.lamaKerjaTahun;
-    if (partial.buktiAbsensi) ormData.bukti_absensi = partial.buktiAbsensi;
-    if (partial.createdAt) ormData.created_at = partial.createdAt;
-    if (partial.updatedAt) ormData.updated_at = partial.updatedAt;
-    if (partial.deletedAt) ormData.deleted_at = partial.deletedAt;
+  if (partial.nasabah)
+    ormData.nasabah! = {
+      id: partial.nasabah.id,
+    } as ClientInternal_ORM_Entity;
+  if (partial.perusahaan) ormData.perusahaan = partial.perusahaan;
+  if (partial.divisi) ormData.divisi = partial.divisi;
+  if (partial.golongan) ormData.golongan = partial.golongan;
+  if (partial.nama_atasan) ormData.nama_atasan = partial.nama_atasan;
+  if (partial.nama_hrd) ormData.nama_hrd = partial.nama_hrd;
+  if (partial.absensi) ormData.absensi = partial.absensi;
+  if (partial.yayasan) ormData.yayasan = partial.yayasan;
+  if (partial.lama_kerja_bulan)
+    ormData.lama_kerja_bulan = partial.lama_kerja_bulan;
+  if (partial.lama_kerja_tahun)
+    ormData.lama_kerja_tahun = partial.lama_kerja_tahun;
+  if (partial.bukti_absensi) ormData.bukti_absensi = partial.bukti_absensi;
+  if (partial.created_at) ormData.created_at = partial.created_at;
+  if (partial.updated_at) ormData.updated_at = partial.updated_at;
+  if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
 
-    return ormData;
-  }
+  return ormData;
+}
+
 
   //?===================================================================================
 
@@ -98,7 +99,7 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
 
   async findByNasabahId(nasabahId: number): Promise<JobInternal[]> {
     const ormEntities = await this.ormRepository.find({
-      where: { nasabah_id: { id: nasabahId } },
+      where: { nasabah: { id: nasabahId } },
     });
     return ormEntities.map(this.toDomain);
   }
@@ -116,7 +117,6 @@ export class JobInternalRepositoryImpl implements IJobInternalRepository {
     await this.ormRepository.update(id, this.toOrmPartial(jobData));
     const updated = await this.ormRepository.findOne({
       where: { id },
-      relations: ['nasabah_id'], // Force load relasi sebagai object
     });
     if (!updated) throw new Error('Job not found');
     return this.toDomain(updated);
