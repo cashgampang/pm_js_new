@@ -5,7 +5,7 @@ import { ApprovalInternalStatusEnum } from 'src/Shared/Enums/Internal/Approval.e
 export class ApprovalInternal {
   constructor(
     public readonly pengajuan: number, // Relationship to LoanApplicationInternal
-    public readonly user: number, // Relationship to Users PIC (MKT, SPV, CA, HM)
+    public readonly user: {id: number}, // Relationship to Users PIC (MKT, SPV, CA, HM)
     public readonly role: USERTYPE,
     public status: ApprovalInternalStatusEnum = ApprovalInternalStatusEnum.PENDING, // Default status
     public readonly isBanding: boolean = false,

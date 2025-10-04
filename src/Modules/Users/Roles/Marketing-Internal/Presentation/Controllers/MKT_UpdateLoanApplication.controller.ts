@@ -11,13 +11,13 @@ import {
 import { MKT_UpdateLoanApplicationUseCase } from '../../Applications/Services/MKT_UpdateLoanApplication.usecase';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
-import { Public } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/public.decorator';
 
 @Controller('mkt/int/loan-apps')
 export class MKT_UpdateLoanApplicationController {
   constructor(
     private readonly updateLoanApplication: MKT_UpdateLoanApplicationUseCase,
   ) {}
+
   @Patch('update/:id')
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -31,7 +31,7 @@ export class MKT_UpdateLoanApplicationController {
     ]),
   )
   async update(
-    @Param('id') clientId: number,
+    @Param('id') clientIdParam: string,
     @CurrentUser('id') marketingId: number,
     @Body() dto: any,
     @UploadedFiles()
@@ -45,25 +45,31 @@ export class MKT_UpdateLoanApplicationController {
       foto_rekening?: Express.Multer.File[];
     },
   ) {
-    console.log('Request body:', dto);
-    console.log('Uploaded files:', files);
-    console.log('Client ID:', clientId);
-
     try {
-      // parse payload kalau masih string
-      const payload =
-        typeof dto.payload === 'string' ? JSON.parse(dto.payload) : dto.payload;
+      const clientId = Number(clientIdParam);
+      if (isNaN(clientId)) {
+        throw new BadRequestException('Invalid client ID');
+      }
 
-      return await this.updateLoanApplication.execute(
-        payload,
-        files,
-        clientId, // untuk update
-      );
+      // Gunakan dto langsung, tanpa dto.payload
+      if (!dto || typeof dto !== 'object') {
+        throw new BadRequestException('Request body must be a valid object');
+      }
+
+      console.log('Request body:', dto);
+      console.log('Uploaded files:', files);
+      console.log('Client ID (parsed):', clientId);
+
+      const result = await this.updateLoanApplication.execute(dto, files, clientId);
+
+      console.log('Update result:', result);
+
+      return result;
     } catch (error) {
       console.log('Error occurred:', error);
 
       if (error instanceof BadRequestException) {
-        throw new BadRequestException('Invalid request data or files');
+        throw error;
       } else {
         throw new InternalServerErrorException(
           'An error occurred while processing your request',

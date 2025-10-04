@@ -30,7 +30,6 @@ export class MKT_CreateDraftLoanApplicationUseCase {
   ) {}
 
   async executeCreateDraft(
-    marketingId: number,
     dto: PayloadDTO,
     files?: Record<string, Express.Multer.File[]>,
   ) {
@@ -39,17 +38,16 @@ export class MKT_CreateDraftLoanApplicationUseCase {
 
       if (files && Object.keys(files).length > 0) {
         filePaths = await this.fileStorage.saveDraftsFile(
-          marketingId,
-          dto.client_internal?.nama_lengkap ?? `draft-${marketingId}`,
+          dto.marketing_id ,
+          dto.client_internal?.nama_lengkap ?? `draft-${dto.marketing_id}`,
           files,
         );
       }
 
       console.log('File paths:', filePaths);
-      console.log('Payload:', dto);
+      console.log('Payload (with marketingId):', dto);
 
       const loanApp = await this.loanAppDraftRepo.create({
-        marketing_id: marketingId,
         ...dto,
         uploaded_files: filePaths,
       });
@@ -75,7 +73,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
               reference: 'LOAN_VALIDATION_ERROR',
             },
           },
-          HttpStatus.BAD_REQUEST, // ⬅️ 400 bukan 201
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -86,7 +84,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
             message: `Duplicate field: ${Object.keys(err.keyValue).join(', ')}`,
             reference: 'LOAN_DUPLICATE_KEY',
           },
-          HttpStatus.CONFLICT, // ⬅️ 409 untuk duplicate
+          HttpStatus.CONFLICT,
         );
       }
 
@@ -194,33 +192,37 @@ export class MKT_CreateDraftLoanApplicationUseCase {
     }
   }
 
-  async deleteDraftByMarketingId(Id: string) {
-    try {
-      await this.loanAppDraftRepo.softDelete(Id);
-      throw new HttpException(
-        {
-          payload: {
-            error: false,
-            message: 'Draft loan applications deleted',
-            reference: 'LOAN_DELETE_OK',
-            data: [],
-          },
+  async deleteDraftByMarketingId(id: string) {
+  try {
+    await this.loanAppDraftRepo.softDelete(id);
+
+    return {
+      payload: {
+        error: false,
+        message: 'Draft loan applications deleted',
+        reference: 'LOAN_DELETE_OK',
+        data: [],
+      },
+    };
+  } catch (error) {
+    console.error('DeleteDraft Error >>>', error);
+    throw new HttpException(
+      {
+        payload: {
+          error: true,
+          message:
+            error.message || 'Draft tidak ditemukan atau unexpected error',
+          reference: 'LOAN_DELETE_ERROR',
         },
-        HttpStatus.NO_CONTENT,
-      );
-    } catch (error) {
-      throw new HttpException(
-        {
-          payload: {
-            error: 'Unexpected error',
-            message: 'Unexpected error',
-            reference: 'LOAN_UNKNOWN_ERROR',
-          },
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
+}
+
+
+
+
   async updateDraftById(
     Id: string,
     updateData: Partial<CreateDraftLoanApplicationDto>,

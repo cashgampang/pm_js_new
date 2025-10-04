@@ -84,7 +84,7 @@ export class SPV_ApproveOrRejectUseCase {
       // Buat entitas approval
       const approval = new ApprovalInternal(
         loan_id,
-        user_id,
+        {id: user.id!},
         role,
         ApprovalInternalStatusEnum.PENDING,
         false,

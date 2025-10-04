@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/G
 import { RolesGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/roles.guard';
 import { MKT_CreateDraftLoanApplicationUseCase } from '../../Applications/Services/MKT_CreateDraftLoanApp.usecase';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { PayloadDTO } from 'src/Shared/Modules/Drafts/Applications/DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
 import { Public } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/public.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,53 +28,57 @@ export class MKT_CreateDraftLoanApplicationController {
     private readonly MKT_CreateDraftLoanAppUseCase: MKT_CreateDraftLoanApplicationUseCase,
   ) {}
 
-  @Public()
-  @Post('add')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'foto_ktp', maxCount: 1 },
-      { name: 'foto_kk', maxCount: 1 },
-      { name: 'foto_rekening', maxCount: 1 },
-    ]),
-  )
-  async createDraft(
-    // @CurrentUser('id') marketingId: number,
-    @Body() dto: any,
-    @UploadedFiles() files: Record<string, Express.Multer.File[]>,
-  ) {
-    // parse dulu
-    const payload =
-      typeof dto.payload === 'string' ? JSON.parse(dto.payload) : dto.payload;
-
-    console.log('File paths:', files);
-    console.log('Payload parsed:', payload);
-
-    try {
-      const marketingId = 1;
-
-      if (!Object.values(files).some((arr) => arr && arr.length > 0)) {
-        throw new BadRequestException('No files uploaded');
-      }
-
-      return this.MKT_CreateDraftLoanAppUseCase.executeCreateDraft(
-        marketingId,
-        payload, // <<=== ini harus parsed object
-        files,
-      );
-    } catch (error) {
-      console.log('Error occurred:', error);
-
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException('Invalid request data or files');
-      } else {
-        throw new InternalServerErrorException(
-          'An error occurred while processing your request',
-        );
-      }
-    }
-  }
-
   // @Public()
+ @Post('add')
+@UseInterceptors(
+  FileFieldsInterceptor([
+    { name: 'foto_ktp', maxCount: 1 },
+    { name: 'foto_kk', maxCount: 1 },
+    { name: 'foto_rekening', maxCount: 1 },
+  ]),
+)
+async createDraft(
+  @CurrentUser('id') marketingId: number,
+  @Body() dto: any,
+  @UploadedFiles() files: Record<string, Express.Multer.File[]>,
+) {
+  try {
+    let payload: PayloadDTO;
+
+    // parsing dto.payload biar tetap fleksibel (string / object)
+    if (dto.payload) {
+      payload =
+        typeof dto.payload === 'string'
+          ? JSON.parse(dto.payload)
+          : dto.payload;
+    } else {
+      payload = { client_internal: {} } as PayloadDTO;
+    }
+
+    // ⬇️ marketingId langsung dimasukin otomatis, ga perlu di payload request
+    payload.marketing_id = marketingId;
+
+    console.log('Files uploaded:', files);
+    console.log('Payload parsed (with marketingId):', payload);
+
+    if (!files || Object.values(files).length === 0) {
+      throw new BadRequestException('No files uploaded');
+    }
+
+    // ⬇️ cukup passing payload yang udah ada marketing_id nya
+    return this.MKT_CreateDraftLoanAppUseCase.executeCreateDraft(
+      payload,
+      files,
+    );
+  } catch (error) {
+    console.error('Error occurred:', error);
+    throw new InternalServerErrorException(
+      'An error occurred while processing your request',
+    );
+  }
+}
+
+
   @Get()
   async getDraftByMarketingId(@CurrentUser('id') marketingId: number) {
     return this.MKT_CreateDraftLoanAppUseCase.renderDraftByMarketingId(
@@ -87,7 +92,6 @@ export class MKT_CreateDraftLoanApplicationController {
   }
 
   @Delete('delete/:id')
-  // async (@CurrentUser('id') Id: number) {
   async softDelete(@Param('id') Id: string) {
     return this.MKT_CreateDraftLoanAppUseCase.deleteDraftByMarketingId(Id);
   }
@@ -103,13 +107,14 @@ export class MKT_CreateDraftLoanApplicationController {
   )
   async updateDraftById(
     @Param('id') Id: string,
-    @Body() updateData: any = {}, // biar gampang parsing payload json
+    @Body() updateData: any = {},
     @UploadedFiles() files: Record<string, Express.Multer.File[]>,
   ) {
     const payload =
       typeof updateData.payload === 'string'
         ? JSON.parse(updateData.payload)
         : updateData.payload;
+
     return this.MKT_CreateDraftLoanAppUseCase.updateDraftById(
       Id,
       payload ?? {},
