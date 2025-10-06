@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  Logger,
   Param,
   Patch,
   Post,
@@ -34,9 +35,9 @@ export class MKT_CreateDraftLoanApplicationController {
   FileFieldsInterceptor([
     { name: 'foto_ktp', maxCount: 1 },
     { name: 'foto_kk', maxCount: 1 },
-    { name: 'foto_rekening', maxCount: 1 },
+    // { name: 'foto_rekening', maxCount: 1 },
   ]),
-)
+) 
 async createDraft(
   @CurrentUser('id') marketingId: number,
   @Body() dto: any,
@@ -44,7 +45,7 @@ async createDraft(
 ) {
   try {
     let payload: PayloadDTO;
-
+      
     // parsing dto.payload biar tetap fleksibel (string / object)
     if (dto.payload) {
       payload =
@@ -102,6 +103,7 @@ async createDraft(
       { name: 'foto_ktp', maxCount: 1 },
       { name: 'foto_kk', maxCount: 1 },
       { name: 'foto_rekening', maxCount: 1 },
+      { name: 'foto_id_card', maxCount: 1 },
       { name: 'foto_jaminan', maxCount: 3 },
     ]),
   )

@@ -6,12 +6,14 @@ dotenv.config();
 import { AppModule } from './app.module';
 import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/jwtAuth.guard';
 import cookieParser from 'cookie-parser';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // somewhere in your initialization file
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'], // atur level log
+  });
   app.getHttpAdapter().getInstance().set('trust proxy', 1);
 
   app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));
@@ -66,6 +68,8 @@ async function bootstrap() {
   console.log(
     `Server Successfully Started at http://localhost:${process.env.PORT}`,
   );
+
+  const logger = new Logger('Bootstrap');
 }
 
 bootstrap().catch((err) => {

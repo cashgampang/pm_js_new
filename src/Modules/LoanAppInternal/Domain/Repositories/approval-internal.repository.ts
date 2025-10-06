@@ -7,10 +7,10 @@ export interface IApprovalInternalRepository {
   findById(id: number): Promise<ApprovalInternal | null>;
   findByNasabahId(nasabahId: number): Promise<ApprovalInternal[]>;
   findAll(): Promise<ApprovalInternal[]>;
-  save(address: ApprovalInternal): Promise<ApprovalInternal>;
+  save(approval: ApprovalInternal): Promise<ApprovalInternal>;
   update(
     id: number,
-    address: Partial<ApprovalInternal>,
+    approval: Partial<ApprovalInternal>,
   ): Promise<ApprovalInternal>;
   delete(id: number): Promise<void>;
 }

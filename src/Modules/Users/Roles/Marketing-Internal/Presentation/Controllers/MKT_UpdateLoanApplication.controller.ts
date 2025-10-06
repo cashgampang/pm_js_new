@@ -51,12 +51,11 @@ export class MKT_UpdateLoanApplicationController {
         throw new BadRequestException('Invalid client ID');
       }
 
-      // Gunakan dto langsung, tanpa dto.payload
       if (!dto || typeof dto !== 'object') {
         throw new BadRequestException('Request body must be a valid object');
       }
 
-      console.log('Request body:', dto);
+      console.log('Request body (payload):', dto);
       console.log('Uploaded files:', files);
       console.log('Client ID (parsed):', clientId);
 
@@ -66,7 +65,7 @@ export class MKT_UpdateLoanApplicationController {
 
       return result;
     } catch (error) {
-      console.log('Error occurred:', error);
+      console.log('Error occurred in controller:', error);
 
       if (error instanceof BadRequestException) {
         throw error;

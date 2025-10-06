@@ -226,6 +226,7 @@ export class MKT_CreateLoanApplicationUseCase {
         };
       });
     } catch (err) {
+      console.log(err)
       throw new BadRequestException(err.message || 'Gagal membuat pengajuan');
     }
   }

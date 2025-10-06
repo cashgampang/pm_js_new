@@ -18,6 +18,7 @@ export class CreateDraftLoanApplicationUseCase {
     dto: CreateDraftLoanApplicationDto,
   ) {
     try {
+      console.log(dto)
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,
         client_internal: dto.payload.client_internal,
@@ -27,6 +28,7 @@ export class CreateDraftLoanApplicationUseCase {
         loan_application_internal: dto.payload.loan_application_internal,
         collateral_internal: dto.payload.collateral_internal,
         relative_internal: dto.payload.relative_internal,
+        uploaded_files: dto.uploaded_files,
       });
 
       return {

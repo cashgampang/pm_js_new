@@ -46,7 +46,7 @@ private toDomain(orm: ApprovalInternal_ORM_Entity): ApprovalInternal {
       pengajuan: {
         id: domainEntity.pengajuan,
       } as LoanApplicationInternal_ORM_Entity,
-      user: { id: domainEntity.user } as unknown as Users_ORM_Entity,
+      user: { id: domainEntity.user.id } as Users_ORM_Entity,
       role: domainEntity.role!,
       status: domainEntity.status!,
       is_banding: domainEntity.isBanding,

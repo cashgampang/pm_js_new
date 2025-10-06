@@ -44,7 +44,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
         );
       }
 
-      console.log('File paths:', filePaths);
+      console.log('File paths:', files);
       console.log('Payload (with marketingId):', dto);
 
       const loanApp = await this.loanAppDraftRepo.create({
