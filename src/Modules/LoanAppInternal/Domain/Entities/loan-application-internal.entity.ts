@@ -8,41 +8,41 @@ import {
 export class LoanApplicationInternal {
   constructor(
     // === Immutable ===
-    public readonly nasabahId: number, // ID of ClientInternal
-    public readonly statusPinjaman: StatusPinjamanEnum,
-    public readonly nominalPinjaman: number,
+    public readonly nasabah: {id: number}, // ID of ClientInternal
+    public readonly status_pinjaman: StatusPinjamanEnum,
+    public readonly nominal_pinjaman: number,
     public readonly tenor: number, // bulan
     public readonly keperluan: string,
     public readonly id?: number,
-    public readonly createdAt?: Date,
-    public readonly deletedAt?: Date | null,
+    public readonly created_at?: Date,
+    public readonly deleted_at?: Date | null,
 
     // === Mutable ===
     public status: StatusPengajuanEnum = StatusPengajuanEnum.PENDING,
-    public pinjamanKe?: number,
-    public riwayatNominal?: number,
-    public riwayatTenor?: number,
-    public sisaPinjaman?: number,
+    public pinjaman_ke?: number,
+    public riwayat_nominal?: number,
+    public riwayat_tenor?: number,
+    public sisa_pinjaman?: number,
     public notes?: string,
-    public isBanding: boolean = false,
-    public alasanBanding?: string,
-    public updatedAt?: Date,
+    public is_banding: boolean = false,
+    public alasan_banding?: string,
+    public updated_at?: Date,
   ) {}
 
   // === Business Rules ===
   public canRequestBanding(): boolean {
-    return this.status === StatusPengajuanEnum.REJECTED_CA && !this.isBanding;
+    return this.status === StatusPengajuanEnum.REJECTED_CA && !this.is_banding;
   }
 
   public isOverdue(currentDate: Date): boolean {
-    if (!this.createdAt) return false;
-    const loanEndDate = new Date(this.createdAt);
+    if (!this.created_at) return false;
+    const loanEndDate = new Date(this.created_at);
     loanEndDate.setMonth(loanEndDate.getMonth() + this.tenor);
     return currentDate > loanEndDate;
   }
 
   public hasRemainingDebt(): boolean {
-    return (this.sisaPinjaman ?? 0) > 0;
+    return (this.sisa_pinjaman ?? 0) > 0;
   }
 
   public isActive(): boolean {
@@ -53,20 +53,20 @@ export class LoanApplicationInternal {
   public updateStatus(status: StatusPengajuanEnum, notes?: string): void {
     this.status = status;
     if (notes) this.notes = notes;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   public requestBanding(alasan: string): void {
     if (!this.canRequestBanding()) {
       throw new Error('Pengajuan tidak bisa diajukan banding.');
     }
-    this.isBanding = true;
-    this.alasanBanding = alasan;
-    this.updatedAt = new Date();
+    this.is_banding = true;
+    this.alasan_banding = alasan;
+    this.updated_at = new Date();
   }
 
   public updateRemainingDebt(sisa: number): void {
-    this.sisaPinjaman = sisa;
-    this.updatedAt = new Date();
+    this.sisa_pinjaman = sisa;
+    this.updated_at = new Date();
   }
 }

@@ -27,7 +27,7 @@ export class LoanApplicationInternalRepositoryImpl
   ): LoanApplicationInternal {
     console.log('orm > : ', orm);
     return new LoanApplicationInternal(
-      orm.nasabah_id!.id,
+      orm.nasabah,
       orm.status_pinjaman,
       orm.nominal_pinjaman,
       orm.tenor,
@@ -54,22 +54,22 @@ export class LoanApplicationInternalRepositoryImpl
   ): Partial<LoanApplicationInternal_ORM_Entity> {
     return {
       id: domainEntity.id,
-      nasabah_id: { id: domainEntity.nasabahId } as ClientInternal_ORM_Entity,
-      status_pinjaman: domainEntity.statusPinjaman,
-      nominal_pinjaman: domainEntity.nominalPinjaman,
+      nasabah: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
+      status_pinjaman: domainEntity.status_pinjaman,
+      nominal_pinjaman: domainEntity.nominal_pinjaman,
       tenor: domainEntity.tenor,
       keperluan: domainEntity.keperluan,
       status: domainEntity.status,
-      pinjaman_ke: domainEntity.pinjamanKe,
-      riwayat_nominal: domainEntity.riwayatNominal,
-      riwayat_tenor: domainEntity.riwayatTenor,
-      sisa_pinjaman: domainEntity.sisaPinjaman,
+      pinjaman_ke: domainEntity.pinjaman_ke,
+      riwayat_nominal: domainEntity.riwayat_nominal,
+      riwayat_tenor: domainEntity.riwayat_tenor,
+      sisa_pinjaman: domainEntity.sisa_pinjaman,
       notes: domainEntity.notes,
-      is_banding: domainEntity.isBanding,
-      alasan_banding: domainEntity.alasanBanding,
-      created_at: domainEntity.createdAt,
-      updated_at: domainEntity.updatedAt,
-      deleted_at: domainEntity.deletedAt,
+      is_banding: domainEntity.is_banding,
+      alasan_banding: domainEntity.alasan_banding,
+      created_at: domainEntity.created_at,
+      updated_at: domainEntity.updated_at,
+      deleted_at: domainEntity.deleted_at,
     };
   }
 
@@ -80,28 +80,28 @@ export class LoanApplicationInternalRepositoryImpl
   ): Partial<LoanApplicationInternal_ORM_Entity> {
     const ormData: Partial<LoanApplicationInternal_ORM_Entity> = {};
 
-    if (partial.nasabahId)
-      ormData.nasabah_id! = {
-        id: partial.nasabahId,
+    if (partial.nasabah)
+      ormData.nasabah! = {
+        id: partial.nasabah.id,
       } as ClientInternal_ORM_Entity;
-    if (partial.statusPinjaman)
-      ormData.status_pinjaman = partial.statusPinjaman;
-    if (partial.nominalPinjaman)
-      ormData.nominal_pinjaman = partial.nominalPinjaman;
+    if (partial.status_pinjaman)
+      ormData.status_pinjaman = partial.status_pinjaman;
+    if (partial.nominal_pinjaman)
+      ormData.nominal_pinjaman = partial.nominal_pinjaman;
     if (partial.tenor) ormData.tenor = partial.tenor;
     if (partial.keperluan) ormData.keperluan = partial.keperluan;
     if (partial.status) ormData.status = partial.status;
-    if (partial.pinjamanKe) ormData.pinjaman_ke = partial.pinjamanKe;
-    if (partial.riwayatNominal)
-      ormData.riwayat_nominal = partial.riwayatNominal;
-    if (partial.riwayatTenor) ormData.riwayat_tenor = partial.riwayatTenor;
-    if (partial.sisaPinjaman) ormData.sisa_pinjaman = partial.sisaPinjaman;
+    if (partial.pinjaman_ke) ormData.pinjaman_ke = partial.pinjaman_ke;
+    if (partial.riwayat_nominal)
+      ormData.riwayat_nominal = partial.riwayat_nominal;
+    if (partial.riwayat_tenor) ormData.riwayat_tenor = partial.riwayat_tenor;
+    if (partial.sisa_pinjaman) ormData.sisa_pinjaman = partial.sisa_pinjaman;
     if (partial.notes) ormData.notes = partial.notes;
-    if (partial.isBanding) ormData.is_banding = partial.isBanding;
-    if (partial.alasanBanding) ormData.alasan_banding = partial.alasanBanding;
-    if (partial.createdAt) ormData.created_at = partial.createdAt;
-    if (partial.updatedAt) ormData.updated_at = partial.updatedAt;
-    if (partial.deletedAt) ormData.deleted_at = partial.deletedAt;
+    if (partial.is_banding) ormData.is_banding = partial.is_banding;
+    if (partial.alasan_banding) ormData.alasan_banding = partial.alasan_banding;
+    if (partial.created_at) ormData.created_at = partial.created_at;
+    if (partial.updated_at) ormData.updated_at = partial.updated_at;
+    if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
 
     return ormData;
   }
@@ -111,7 +111,6 @@ export class LoanApplicationInternalRepositoryImpl
   async findById(id: number): Promise<LoanApplicationInternal | null> {
     const ormEntity = await this.ormRepository.findOne({
       where: { id },
-      relations: ['nasabah_id'], // Force load relasi sebagai object
     });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
@@ -119,8 +118,7 @@ export class LoanApplicationInternalRepositoryImpl
   async findByNasabahId(nasabahId: number): Promise<LoanApplicationInternal[]> {
     console.log('REMEMBER SUMMER DAAYYYSSSS >>>>>>>>>>>>>>>> > : ', nasabahId);
     const ormEntities = await this.ormRepository.find({
-      where: { nasabah_id: { id: nasabahId } },
-      relations: ['nasabah_id'],
+      where: { nasabah: { id: nasabahId } }
     });
     console.log(
       'REMEMBER SUMMER DAAYYYSSSS >>>>>>>>>>>>>>>> > : ',
@@ -144,7 +142,6 @@ export class LoanApplicationInternalRepositoryImpl
     await this.ormRepository.update(id, this.toOrmPartial(loanAppData));
     const updated = await this.ormRepository.findOne({
       where: { id },
-      relations: ['nasabah_id'], // Force load relasi sebagai object
     });
     if (!updated) throw new Error('Loan Application not found');
     return this.toDomain(updated);

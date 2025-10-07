@@ -8,14 +8,14 @@ export class ClientValidationService {
    * Cek apakah gender valid sesuai enum
    */
   static isGenderValid(client: ClientInternal): boolean {
-    return Object.values(GENDER).includes(client.jenisKelamin);
+    return Object.values(GENDER).includes(client.jenis_kelamin);
   }
 
   /**
    * Cek apakah status pernikahan valid sesuai enum
    */
   static isMarriageStatusValid(client: ClientInternal): boolean {
-    return Object.values(MARRIAGE_STATUS).includes(client.statusNikah);
+    return Object.values(MARRIAGE_STATUS).includes(client.status_nikah);
   }
 
   /**

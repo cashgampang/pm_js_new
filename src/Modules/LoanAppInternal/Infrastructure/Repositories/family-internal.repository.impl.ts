@@ -1,117 +1,127 @@
-// src/Modules/LoanAppInternal/Infrastructure/Repositories/relative-internal.repository.impl.ts
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RelativesInternal } from '../../Domain/Entities/relative-internal.entity';
-import { IRelativesInternalRepository } from '../../Domain/Repositories/relatives-internal.repository';
-import { RelativeInternal_ORM_Entity } from '../Entities/relative-internal.orm-entity';
+import { FamilyInternal } from '../../Domain/Entities/family-internal.entity';
+import { IFamilyInternalRepository } from '../../Domain/Repositories/family-internal.repository';
+import { FamilyInternal_ORM_Entity } from '../Entities/family-internal.orm-entity';
 import { ClientInternal_ORM_Entity } from '../Entities/client-internal.orm-entity';
-
 @Injectable()
-export class RelativeInternalRepositoryImpl implements IRelativesInternalRepository {
-  private readonly logger = new Logger(RelativeInternalRepositoryImpl.name);
-
+export class FamilyInternalRepositoryImpl implements IFamilyInternalRepository {
   constructor(
-    @InjectRepository(RelativeInternal_ORM_Entity)
-    private readonly ormRepository: Repository<RelativeInternal_ORM_Entity>,
+    @InjectRepository(FamilyInternal_ORM_Entity)
+    private readonly ormRepository: Repository<FamilyInternal_ORM_Entity>,
   ) {}
 
-  // ================= Mapper =================
-  private toDomain(orm: RelativeInternal_ORM_Entity): RelativesInternal | null {
-    if (!orm || !orm.nasabah_id?.id) {
-      this.logger.warn(`Skipping relative id=${orm?.id}, nasabah_id missing`);
-      return null;
-    }
+  //? MAPPER >==========================================================================
 
-    return new RelativesInternal(
-      orm.nasabah_id.id,
-      orm.kerabat_kerja,
-      orm.id,
+  //? All Transactions that using for get datas
+
+  private toDomain(orm: FamilyInternal_ORM_Entity): FamilyInternal {
+    return new FamilyInternal(
+      orm.nasabah,
+      orm.hubungan,
       orm.nama,
-      orm.alamat,
-      orm.no_hp,
-      orm.status_hubungan,
+      orm.bekerja,
+      orm.id,
+      orm.created_at,
+      orm.deleted_at,
       orm.nama_perusahaan,
       orm.jabatan,
       orm.penghasilan,
       orm.alamat_kerja,
-      orm.created_at,
+      orm.no_hp,
       orm.updated_at,
-      orm.deleted_at,
     );
   }
 
-  private toOrm(domain: RelativesInternal): Partial<RelativeInternal_ORM_Entity> {
+  //? All Transactions that using for Create datas
+
+  private toOrm(
+    domainEntity: FamilyInternal,
+  ): Partial<FamilyInternal_ORM_Entity> {
     return {
-      id: domain.id,
-      nasabah_id: { id: domain.nasabahId } as ClientInternal_ORM_Entity,
-      kerabat_kerja: domain.kerabatKerja,
-      nama: domain.nama,
-      alamat: domain.alamat,
-      no_hp: domain.noHp,
-      status_hubungan: domain.statusHubungan,
-      nama_perusahaan: domain.namaPerusahaan,
-      jabatan: domain.jabatan,
-      penghasilan: domain.penghasilan,
-      alamat_kerja: domain.alamatKerja,
-      created_at: domain.createdAt ?? new Date(),
-      updated_at: domain.updatedAt ?? new Date(),
-      deleted_at: domain.deletedAt ?? null,
+      id: domainEntity.id,
+      nasabah: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
+      hubungan: domainEntity.hubungan,
+      nama: domainEntity.nama,
+      bekerja: domainEntity.bekerja,
+      nama_perusahaan: domainEntity.nama_perusahaan,
+      jabatan: domainEntity.jabatan,
+      penghasilan: domainEntity.penghasilan,
+      alamat_kerja: domainEntity.alamat_kerja,
+      no_hp: domainEntity.no_hp,
+      created_at: domainEntity.created_at,
+      updated_at: domainEntity.updated_at,
+      deleted_at: domainEntity.deleted_at,
     };
   }
 
-  private toOrmPartial(partial: Partial<RelativesInternal>): Partial<RelativeInternal_ORM_Entity> {
-    const ormData: Partial<RelativeInternal_ORM_Entity> = {};
-    if (partial.nasabahId !== undefined) ormData.nasabah_id = { id: partial.nasabahId } as ClientInternal_ORM_Entity;
-    if (partial.kerabatKerja !== undefined) ormData.kerabat_kerja = partial.kerabatKerja;
-    if (partial.nama !== undefined) ormData.nama = partial.nama;
-    if (partial.alamat !== undefined) ormData.alamat = partial.alamat;
-    if (partial.noHp !== undefined) ormData.no_hp = partial.noHp;
-    if (partial.statusHubungan !== undefined) ormData.status_hubungan = partial.statusHubungan;
-    if (partial.namaPerusahaan !== undefined) ormData.nama_perusahaan = partial.namaPerusahaan;
-    if (partial.jabatan !== undefined) ormData.jabatan = partial.jabatan;
-    if (partial.penghasilan !== undefined) ormData.penghasilan = partial.penghasilan;
-    if (partial.alamatKerja !== undefined) ormData.alamat_kerja = partial.alamatKerja;
-    if (partial.createdAt !== undefined) ormData.created_at = partial.createdAt;
-    ormData.updated_at = new Date();
-    if (partial.deletedAt !== undefined) ormData.deleted_at = partial.deletedAt;
+  //? All Transactions that using for Partial Update like PATCH or Delete
+
+  private toOrmPartial(
+    partial: Partial<FamilyInternal>,
+  ): Partial<FamilyInternal_ORM_Entity> {
+    const ormData: Partial<FamilyInternal_ORM_Entity> = {};
+
+    if (partial.nasabah)
+      ormData.nasabah! = {
+        id: partial.nasabah.id,
+      } as ClientInternal_ORM_Entity;
+    if (partial.hubungan) ormData.hubungan = partial.hubungan;
+    if (partial.nama) ormData.nama = partial.nama;
+    if (partial.bekerja) ormData.bekerja = partial.bekerja;
+    if (partial.nama_perusahaan)
+      ormData.nama_perusahaan = partial.nama_perusahaan;
+    if (partial.jabatan) ormData.jabatan = partial.jabatan;
+    if (partial.penghasilan) ormData.penghasilan = partial.penghasilan;
+    if (partial.alamat_kerja) ormData.alamat_kerja = partial.alamat_kerja;
+    if (partial.no_hp) ormData.no_hp = partial.no_hp;
+    if (partial.created_at) ormData.created_at = partial.created_at;
+    if (partial.updated_at) ormData.updated_at = partial.updated_at;
+    if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
+
     return ormData;
   }
 
-  // ================= CRUD =================
-  async findAll(): Promise<RelativesInternal[]> {
-    const ormEntities = await this.ormRepository.find({ relations: ['nasabah_id'] });
-    return ormEntities.map(e => this.toDomain(e)).filter(e => e !== null) as RelativesInternal[];
+  //?===================================================================================
+
+  async findById(id: number): Promise<FamilyInternal | null> {
+    const ormEntity = await this.ormRepository.findOne({ where: { id } });
+    return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
-  async findById(id: number): Promise<RelativesInternal | null> {
-    const ormEntity = await this.ormRepository.findOne({ where: { id }, relations: ['nasabah_id'] });
-    const domain = ormEntity ? this.toDomain(ormEntity) : null;
-    if (!domain) this.logger.warn(`Relative with id=${id} not found or nasabah_id missing`);
-    return domain;
+  async findByNasabahId(nasabahId: number): Promise<FamilyInternal[]> {
+    const ormEntities = await this.ormRepository.find({
+      where: { nasabah: { id: nasabahId } },
+    });
+    return ormEntities.map(this.toDomain);
   }
 
-  async findByNasabahId(nasabahId: number): Promise<RelativesInternal[]> {
-    const ormEntities = await this.ormRepository.find({ where: { nasabah_id: { id: nasabahId } }, relations: ['nasabah_id'] });
-    return ormEntities.map(e => this.toDomain(e)).filter(e => e !== null) as RelativesInternal[];
+  async save(address: FamilyInternal): Promise<FamilyInternal> {
+    const ormEntity = this.toOrm(address);
+    const savedOrm = await this.ormRepository.save(ormEntity);
+    return this.toDomain(savedOrm);
   }
 
-  async save(relative: RelativesInternal): Promise<RelativesInternal> {
-    if (!relative.nasabahId) throw new BadRequestException('nasabahId is required');
-    const saved = await this.ormRepository.save(this.toOrm(relative));
-    return this.toDomain(saved)!;
-  }
+  async update(
+    id: number,
+    familyData: Partial<FamilyInternal>,
+  ): Promise<FamilyInternal> {
+    await this.ormRepository.update(id, this.toOrmPartial(familyData));
 
-  async update(id: number, data: Partial<RelativesInternal>): Promise<RelativesInternal> {
-    const existing = await this.ormRepository.findOne({ where: { id }, relations: ['nasabah_id'] });
-    if (!existing) throw new NotFoundException(`Relative with id=${id} not found`);
-    await this.ormRepository.update(id, this.toOrmPartial(data));
-    const updated = await this.ormRepository.findOne({ where: { id }, relations: ['nasabah_id'] });
-    return this.toDomain(updated)!;
+    const updated = await this.ormRepository.findOne({
+      where: { id },
+    });
+    if (!updated) throw new Error('Family not found');
+    return this.toDomain(updated);
   }
 
   async delete(id: number): Promise<void> {
-    const result = await this.ormRepository.softDelete(id);
-    if (result.affected === 0) throw new NotFoundException(`Relative with id=${id} not found`);
+    await this.ormRepository.softDelete(id);
+  }
+
+  async findAll(): Promise<FamilyInternal[]> {
+    const ormEntities = await this.ormRepository.find();
+    return ormEntities.map(this.toDomain);
   }
 }

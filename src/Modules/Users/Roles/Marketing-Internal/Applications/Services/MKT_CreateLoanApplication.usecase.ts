@@ -74,7 +74,7 @@ export class MKT_CreateLoanApplicationUseCase {
     private readonly uow: IUnitOfWork, // handle transaction + rollback
   ) {}
 
-  async execute(dto: any, files: any, marketingId: number) {
+  async execute(dto: any, files: any, marketing_id: number) {
     const now = new Date();
     try {
       return await this.uow.start(async () => {
@@ -91,7 +91,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 1. Simpan Clients
         const customer = await this.clientRepo.save(
           new ClientInternal(
-            marketingId,
+            {id: marketing_id!},
             client_internal.nama_lengkap,
             client_internal.no_ktp,
             client_internal.jenis_kelamin,
@@ -117,19 +117,19 @@ export class MKT_CreateLoanApplicationUseCase {
         // 2. Upload File kalau ada
         const filePaths = await this.fileStorage.saveFiles(
           customer.id!,
-          customer.namaLengkap,
+          customer.nama_lengkap,
           files,
         );
 
-        customer.fotoKtp =
+        customer.foto_ktp =
           filePaths['foto_ktp']?.[0] ?? client_internal.foto_ktp ?? null;
-        customer.fotoKk =
+        customer.foto_kk =
           filePaths['foto_kk']?.[0] ?? client_internal.foto_kk ?? null;
-        customer.fotoIdCard =
+        customer.foto_id_card =
           filePaths['foto_id_card']?.[0] ??
           client_internal.foto_id_card ??
           null;
-        customer.fotoRekening =
+        customer.foto_rekening =
           filePaths['foto_rekening']?.[0] ??
           client_internal.foto_rekening ??
           null;
@@ -139,7 +139,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 3. Address
         await this.addressRepo.save(
           new AddressInternal(
-            customer.id!,
+            {id: customer.id!},
             address_internal.alamat_ktp,
             address_internal.kelurahan,
             address_internal.rt_rw,
@@ -155,7 +155,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 4. Family
         await this.familyRepo.save(
           new FamilyInternal(
-            customer.id!,
+            {id: customer.id!},
             family_internal.hubungan,
             family_internal.nama,
             family_internal.bekerja,
@@ -166,7 +166,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 5. Job
         await this.jobRepo.save(
           new JobInternal(
-            customer.id!,
+            {id: customer.id!},
             job_internal.perusahaan,
             job_internal.divisi,
             job_internal.lama_kerja_tahun,
@@ -181,7 +181,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 6. Loan Application
         const loanApp = await this.loanAppRepo.save(
           new LoanApplicationInternal(
-            customer.id!,
+            {id: customer.id!},
             loan_application_internal.status_pinjaman,
             loan_application_internal.nominal_pinjaman,
             loan_application_internal.tenor,
@@ -193,7 +193,7 @@ export class MKT_CreateLoanApplicationUseCase {
         // 7. Collateral
         await this.collateralRepo.save(
           new CollateralInternal(
-            customer.id!,
+            {id: customer.id!},
             collateral_internal.jaminan_hrd,
             collateral_internal.jaminan_cg,
             collateral_internal.penjamin,
@@ -204,7 +204,7 @@ export class MKT_CreateLoanApplicationUseCase {
         if (relative_internal) {
           await this.relativeRepo.save(
             new RelativesInternal(
-              customer.id!,
+              {id: customer.id!},
               relative_internal.kerabat_kerja,
               relative_internal.nama,
               relative_internal.alamat,
@@ -226,6 +226,7 @@ export class MKT_CreateLoanApplicationUseCase {
         };
       });
     } catch (err) {
+      console.log(err)
       throw new BadRequestException(err.message || 'Gagal membuat pengajuan');
     }
   }

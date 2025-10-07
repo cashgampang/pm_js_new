@@ -5,6 +5,8 @@ import { ClientExternal } from '../../Domain/Entities/client-external.entity';
 import { IClientExternalRepository } from '../../Domain/Repositories/client-external.repository';
 import { ClientExternal_ORM_Entity } from '../Entities/client-external.orm-entity';
 import { Users_ORM_Entity } from 'src/Modules/Users/Infrastructure/Entities/users.orm-entity';
+import { promises } from 'dns';
+import { CicilanLainEnum } from 'src/Shared/Enums/External/Other-Exist-Loans.enum';
 
 @Injectable()
 export class ClientExternalRepositoryImpl implements IClientExternalRepository {
@@ -16,7 +18,7 @@ export class ClientExternalRepositoryImpl implements IClientExternalRepository {
   // ===================== MAPPER =====================
   private toDomain(ormEntity: ClientExternal_ORM_Entity): ClientExternal {
     return new ClientExternal(
-      ormEntity.marketing.id, // FK marketingId
+      ormEntity.marketing, // FK marketingId
       ormEntity.nama_lengkap,
       ormEntity.nik,
       ormEntity.no_kk,
@@ -32,16 +34,16 @@ export class ClientExternalRepositoryImpl implements IClientExternalRepository {
       ormEntity.validasi_nasabah,
       ormEntity.catatan,
       ormEntity.id,
-      ormEntity.created_at,
-      ormEntity.updated_at,
-      ormEntity.deleted_at,
+      ormEntity.created_at ?? new Date(),
+      ormEntity.updated_at ?? new Date(),
+      ormEntity.deleted_at ?? null,
     );
   }
 
   private toOrm(domainEntity: ClientExternal): Partial<ClientExternal_ORM_Entity> {
     return {
       id: domainEntity.id,
-      marketing: { id: domainEntity.marketingId } as Users_ORM_Entity,
+      marketing: { id: domainEntity.marketing.id } as Users_ORM_Entity,
       nama_lengkap: domainEntity.namaLengkap,
       nik: domainEntity.nik,
       no_kk: domainEntity.noKk,
@@ -65,7 +67,7 @@ export class ClientExternalRepositoryImpl implements IClientExternalRepository {
   private toOrmPartial(partial: Partial<ClientExternal>): Partial<ClientExternal_ORM_Entity> {
     const ormData: Partial<ClientExternal_ORM_Entity> = {};
 
-    if (partial.marketingId) ormData.marketing = { id: partial.marketingId } as Users_ORM_Entity;
+    if (partial.marketing) ormData.marketing! = { id: partial.marketing.id } as Users_ORM_Entity;
     if (partial.namaLengkap) ormData.nama_lengkap = partial.namaLengkap;
     if (partial.nik) ormData.nik = partial.nik;
     if (partial.noKk) ormData.no_kk = partial.noKk;
@@ -91,7 +93,6 @@ export class ClientExternalRepositoryImpl implements IClientExternalRepository {
   async findById(id: number): Promise<ClientExternal | null> {
     const ormEntity = await this.ormRepository.findOne({
       where: { id },
-      relations: ['marketing'],
     });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
@@ -99,27 +100,32 @@ export class ClientExternalRepositoryImpl implements IClientExternalRepository {
   async findByMarketingId(marketingId: number): Promise<ClientExternal[]> {
     const ormEntities = await this.ormRepository.find({
       where: { marketing: { id: marketingId } },
-      relations: ['marketing'],
     });
-    return ormEntities.map((e) => this.toDomain(e));
+    return ormEntities.map(this.toDomain);
   }
 
   async findAll(): Promise<ClientExternal[]> {
-    const ormEntities = await this.ormRepository.find({ relations: ['marketing'] });
-    return ormEntities.map((e) => this.toDomain(e));
+    const ormEntities = await this.ormRepository.find();
+    return ormEntities.map(this.toDomain);
   }
 
-  async save(client: ClientExternal): Promise<ClientExternal> {
-    const ormEntity = this.toOrm(client);
-    const savedOrm = await this.ormRepository.save(ormEntity);
-    return this.toDomain(savedOrm as ClientExternal_ORM_Entity);
+  async save(client_external: ClientExternal): Promise<ClientExternal> {
+    const savedOrm = await this.ormRepository.save(client_external);
+    return savedOrm;
   }
+  
 
-  async update(id: number, clientData: Partial<ClientExternal>): Promise<ClientExternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(clientData));
-    const updated = await this.ormRepository.findOne({ where: { id }, relations: ['marketing'] });
-    if (!updated) throw new Error('ClientExternal not found');
-    return this.toDomain(updated);
+  async update(
+    id: number,
+    client_externalData: Partial<ClientExternal>,
+  ): Promise<ClientExternal> {
+    await this.ormRepository.update(id, this.toOrmPartial(client_externalData));
+    const updated = await this.ormRepository.findOne({
+      where: {id},
+      relations: ['marketing'],
+    });
+    if (!updated) throw new Error('Data not found');
+      return this.toDomain(updated);
   }
 
   async delete(id: number): Promise<void> {

@@ -14,7 +14,7 @@ export class AddressValidationService {
    * Cek apakah status rumah valid sesuai enum
    */
   static isStatusRumahValid(address: AddressInternal): boolean {
-    return Object.values(StatusRumahEnum).includes(address.statusRumah);
+    return Object.values(StatusRumahEnum).includes(address.status_rumah);
   }
 
   /**

@@ -5,6 +5,8 @@ import {
 } from '../../../Domain/Repositories/LoanAppInt.repository';
 import { CreateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
 import { LoanApplicationEntity } from '../../../Domain/Entities/LoanAppInt.entity';
+import { UpdateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/UpdateDraft_LoanAppInt.dto';
+
 
 @Injectable()
 export class CreateDraftLoanApplicationUseCase {
@@ -18,6 +20,7 @@ export class CreateDraftLoanApplicationUseCase {
     dto: CreateDraftLoanApplicationDto,
   ) {
     try {
+      console.log(dto)
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,
         client_internal: dto.payload.client_internal,
@@ -27,6 +30,7 @@ export class CreateDraftLoanApplicationUseCase {
         loan_application_internal: dto.payload.loan_application_internal,
         collateral_internal: dto.payload.collateral_internal,
         relative_internal: dto.payload.relative_internal,
+        uploaded_files: dto.uploaded_files,
       });
 
       return {
@@ -115,33 +119,50 @@ export class CreateDraftLoanApplicationUseCase {
     }
   }
 
-  async updateDraftById(
-    Id: string,
-    updateData: Partial<CreateDraftLoanApplicationDto>,
-  ) {
+async updateDraftById(
+  id: string,
+  updateData: any, // langsung body, gak usah DTO dengan payload
+) {
+  console.log('🟢 [updateDraftById] START');
+  console.log('➡️ Incoming ID:', id);
+  console.log('➡️ Incoming Body:', JSON.stringify(updateData, null, 2));
 
-    const { payload } = updateData;
-    const entityUpdate: Partial<LoanApplicationEntity> = {
-      ...payload, //spread it
-    };
+  // Ambil draft lama dulu
+  const existing = await this.loanAppDraftRepo.findDraftById(id);
+  if (!existing) throw new Error('❌ Draft not found');
 
-    try {
-      const loanApp = await this.loanAppDraftRepo.updateDraftById(
-        Id,
-        entityUpdate,
-      );
-      return {
-        error: false,
-        message: 'Draft loan applications updated',
-        reference: 'LOAN_UPDATE_OK',
-        data: loanApp,
-      };
-    } catch (error) {
-      return {
-        error: true,
-        message: error.message || 'Unexpected error',
-        reference: 'LOAN_UNKNOWN_ERROR',
-      };
-    }
-  }
+  console.log('🔍 Existing Draft:', JSON.stringify(existing, null, 2));
+
+  // Gabungkan data lama dengan data baru
+interface DraftEntity {
+  uploaded_files?: Record<string, any>;
+  [key: string]: any;
+}
+
+const entityUpdate: DraftEntity = {
+  ...(existing as DraftEntity),
+  ...(updateData as DraftEntity),
+  uploaded_files: {
+    ...((existing as DraftEntity).uploaded_files ?? {}),
+    ...((updateData as DraftEntity).uploaded_files ?? {}),
+  },
+};
+
+
+  console.log('🧩 Final entityUpdate to save:', JSON.stringify(entityUpdate, null, 2));
+
+  // Update langsung ke ORM
+  const updated = await this.loanAppDraftRepo.updateDraftById(id, entityUpdate);
+
+  console.log('✅ Repository returned:', JSON.stringify(updated, null, 2));
+
+  return {
+    error: false,
+    message: 'Draft loan application updated successfully',
+    data: updated,
+  };
+}
+
+
+
 }

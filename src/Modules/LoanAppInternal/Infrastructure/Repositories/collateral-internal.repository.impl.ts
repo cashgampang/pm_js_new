@@ -8,12 +8,11 @@ import { ClientInternal_ORM_Entity } from '../Entities/client-internal.orm-entit
 
 @Injectable()
 export class CollateralInternalRepositoryImpl
-  implements ICollateralInternalRepository
-{
+  implements ICollateralInternalRepository {
   constructor(
     @InjectRepository(CollateralInternal_ORM_Entity)
     private readonly ormRepository: Repository<CollateralInternal_ORM_Entity>,
-  ) {}
+  ) { }
 
   //? MAPPER >==========================================================================
 
@@ -22,7 +21,7 @@ export class CollateralInternalRepositoryImpl
   private toDomain(orm: CollateralInternal_ORM_Entity): CollateralInternal {
     console.log('orm > : ', orm.nasabah_id?.id);
     return new CollateralInternal(
-      orm.nasabah_id!.id,
+      orm.nasabah_id,
       orm.jaminan_hrd,
       orm.jaminan_cg,
       orm.penjamin,
@@ -52,25 +51,25 @@ export class CollateralInternalRepositoryImpl
   ): Partial<CollateralInternal_ORM_Entity> {
     return {
       id: domainEntity.id,
-      nasabah_id: { id: domainEntity.nasabahId } as ClientInternal_ORM_Entity,
-      jaminan_hrd: domainEntity.jaminanHrd,
-      jaminan_cg: domainEntity.jaminanCg,
+      nasabah_id: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
+      jaminan_hrd: domainEntity.jaminan_hrd,
+      jaminan_cg: domainEntity.jaminan_cg,
       penjamin: domainEntity.penjamin,
-      nama_penjamin: domainEntity.namaPenjamin,
-      lama_kerja_penjamin: domainEntity.lamaKerjaPenjamin,
+      nama_penjamin: domainEntity.nama_penjamin,
+      lama_kerja_penjamin: domainEntity.lama_kerja_penjamin,
       bagian: domainEntity.bagian,
       absensi: domainEntity.absensi,
-      riwayat_pinjam_penjamin: domainEntity.riwayatPinjamPenjamin,
-      riwayat_nominal_penjamin: domainEntity.riwayatNominalPenjamin,
-      riwayat_tenor_penjamin: domainEntity.riwayatTenorPenjamin,
-      sisa_pinjaman_penjamin: domainEntity.sisaPinjamanPenjamin,
-      jaminan_cg_penjamin: domainEntity.jaminanCgPenjamin,
-      status_hubungan_penjamin: domainEntity.statusHubunganPenjamin,
-      foto_ktp_penjamin: domainEntity.fotoKtpPenjamin,
-      foto_id_card_penjamin: domainEntity.fotoIdCardPenjamin,
-      created_at: domainEntity.createdAt,
-      updated_at: domainEntity.updatedAt,
-      deleted_at: domainEntity.deletedAt,
+      riwayat_pinjam_penjamin: domainEntity.riwayat_pinjam_penjamin,
+      riwayat_nominal_penjamin: domainEntity.riwayat_nominal_penjamin,
+      riwayat_tenor_penjamin: domainEntity.riwayat_tenor_penjamin,
+      sisa_pinjaman_penjamin: domainEntity.sisa_pinjaman_penjamin,
+      jaminan_cg_penjamin: domainEntity.jaminan_cg_penjamin,
+      status_hubungan_penjamin: domainEntity.status_hubungan_penjamin,
+      foto_ktp_penjamin: domainEntity.foto_ktp_penjamin,
+      foto_id_card_penjamin: domainEntity.foto_id_card_penjamin,
+      created_at: domainEntity.created_at,
+      updated_at: domainEntity.updated_at,
+      deleted_at: domainEntity.deleted_at,
     };
   }
 
@@ -81,37 +80,29 @@ export class CollateralInternalRepositoryImpl
   ): Partial<CollateralInternal_ORM_Entity> {
     const ormData: Partial<CollateralInternal_ORM_Entity> = {};
 
-    if (partial.nasabahId)
+    if (partial.nasabah)
       ormData.nasabah_id! = {
-        id: partial.nasabahId,
+        id: partial.nasabah.id,
       } as ClientInternal_ORM_Entity;
-    if (partial.jaminanHrd) ormData.jaminan_hrd = partial.jaminanHrd;
-    if (partial.jaminanCg) ormData.jaminan_cg = partial.jaminanCg;
+    if (partial.jaminan_hrd) ormData.jaminan_hrd = partial.jaminan_hrd;
+    if (partial.jaminan_cg) ormData.jaminan_cg = partial.jaminan_cg;
     if (partial.penjamin) ormData.penjamin = partial.penjamin;
-    if (partial.namaPenjamin) ormData.nama_penjamin = partial.namaPenjamin;
-    if (partial.lamaKerjaPenjamin)
-      ormData.lama_kerja_penjamin = partial.lamaKerjaPenjamin;
+    if (partial.nama_penjamin) ormData.nama_penjamin = partial.nama_penjamin;
+    if (partial.lama_kerja_penjamin) ormData.lama_kerja_penjamin = partial.lama_kerja_penjamin;
     if (partial.bagian) ormData.bagian = partial.bagian;
     if (partial.absensi) ormData.absensi = partial.absensi;
-    if (partial.riwayatPinjamPenjamin)
-      ormData.riwayat_pinjam_penjamin = partial.riwayatPinjamPenjamin;
-    if (partial.riwayatNominalPenjamin)
-      ormData.riwayat_nominal_penjamin = partial.riwayatNominalPenjamin;
-    if (partial.riwayatTenorPenjamin)
-      ormData.riwayat_tenor_penjamin = partial.riwayatTenorPenjamin;
-    if (partial.sisaPinjamanPenjamin)
-      ormData.sisa_pinjaman_penjamin = partial.sisaPinjamanPenjamin;
-    if (partial.jaminanCgPenjamin)
-      ormData.jaminan_cg_penjamin = partial.jaminanCgPenjamin;
-    if (partial.statusHubunganPenjamin)
-      ormData.status_hubungan_penjamin = partial.statusHubunganPenjamin;
-    if (partial.fotoKtpPenjamin)
-      ormData.foto_ktp_penjamin = partial.fotoKtpPenjamin;
-    if (partial.fotoIdCardPenjamin)
-      ormData.foto_id_card_penjamin = partial.fotoIdCardPenjamin;
-    if (partial.createdAt) ormData.created_at = partial.createdAt;
-    if (partial.updatedAt) ormData.updated_at = partial.updatedAt;
-    if (partial.deletedAt) ormData.deleted_at = partial.deletedAt;
+    if (partial.riwayat_pinjam_penjamin) ormData.riwayat_pinjam_penjamin = partial.riwayat_pinjam_penjamin;
+    if (partial.riwayat_nominal_penjamin) ormData.riwayat_nominal_penjamin = partial.riwayat_nominal_penjamin;
+    if (partial.riwayat_tenor_penjamin) ormData.riwayat_tenor_penjamin = partial.riwayat_tenor_penjamin;
+    if (partial.sisa_pinjaman_penjamin) ormData.sisa_pinjaman_penjamin = partial.sisa_pinjaman_penjamin;
+    if (partial.jaminan_cg_penjamin) ormData.jaminan_cg_penjamin = partial.jaminan_cg_penjamin;
+    if (partial.status_hubungan_penjamin) ormData.status_hubungan_penjamin = partial.status_hubungan_penjamin;
+    if (partial.foto_ktp_penjamin) ormData.foto_ktp_penjamin = partial.foto_ktp_penjamin;
+    if (partial.foto_id_card_penjamin) ormData.foto_id_card_penjamin = partial.foto_id_card_penjamin;
+    if (partial.created_at) ormData.created_at = partial.created_at;
+    if (partial.updated_at) ormData.updated_at = partial.updated_at;
+    if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
+
 
     return ormData;
   }

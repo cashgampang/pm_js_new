@@ -12,6 +12,9 @@ export class ApprovalInternalController {
 
   @Post()
   async create(@Body() dto: CreateApprovalDto) {
+    console.log(`
+      
+      TOL KONTL:`, dto)
     return this.approvalService.create(dto);
   }
 

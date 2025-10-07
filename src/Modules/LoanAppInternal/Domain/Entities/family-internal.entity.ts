@@ -1,14 +1,22 @@
-import { BekerjaEnum, HubunganEnum } from 'src/Shared/Enums/Internal/Family.enum';
+// domain/entities/family-internal.entity.ts
+
+import {
+  BekerjaEnum,
+  HubunganEnum,
+} from 'src/Shared/Enums/Internal/Family.enum';
 
 export class FamilyInternal {
   constructor(
-    public readonly nasabah_id: number,
+    // === Immutable ===
+    public readonly nasabah: {id: number}, // ID of ClientInternal
     public readonly hubungan: HubunganEnum,
     public readonly nama: string,
     public readonly bekerja: BekerjaEnum,
     public readonly id?: number,
     public readonly created_at?: Date,
-    public readonly deleted_at?: Date,
+    public readonly deleted_at?: Date | null,
+
+    // === Mutable ===
     public nama_perusahaan?: string,
     public jabatan?: string,
     public penghasilan?: number,
@@ -17,39 +25,41 @@ export class FamilyInternal {
     public updated_at?: Date,
   ) {}
 
-  public is_employed(): boolean {
+  // === Business Rules ===
+  public isEmployed(): boolean {
     return this.bekerja === BekerjaEnum.YA;
   }
 
-  public has_company_info(): boolean {
+  public hasCompanyInfo(): boolean {
     return !!this.nama_perusahaan && !!this.jabatan;
   }
 
-  public has_income(): boolean {
-    return this.is_employed() && (this.penghasilan ?? 0) > 0;
+  public hasIncome(): boolean {
+    return this.isEmployed() && (this.penghasilan ?? 0) > 0;
   }
 
-  public is_emergency_contact(): boolean {
-    return [HubunganEnum.SUAMI, HubunganEnum.ISTRI, HubunganEnum.ORANG_TUA].includes(this.hubungan);
+  public isEmergencyContact(): boolean {
+    return this.hubungan === HubunganEnum.SUAMI ||
+           this.hubungan === HubunganEnum.ISTRI ||
+           this.hubungan === HubunganEnum.ORANG_TUA;
   }
 
-  public update_job_info(
+  // === Update Methods ===
+  public updateJobInfo(
     nama_perusahaan?: string,
     jabatan?: string,
     penghasilan?: number,
     alamat_kerja?: string,
   ): void {
-    if (nama_perusahaan !== undefined) this.nama_perusahaan = nama_perusahaan;
-    if (jabatan !== undefined) this.jabatan = jabatan;
-    if (penghasilan !== undefined) this.penghasilan = penghasilan;
-    if (alamat_kerja !== undefined) this.alamat_kerja = alamat_kerja;
-
+    this.nama_perusahaan = nama_perusahaan;
+    this.jabatan = jabatan;
+    this.penghasilan = penghasilan;
+    this.alamat_kerja = alamat_kerja;
     this.updated_at = new Date();
   }
 
-  public update_contact(no_hp?: string): void {
-    if (no_hp !== undefined) this.no_hp = no_hp;
+  public updateContact(noHp: string): void {
+    this.no_hp = noHp;
     this.updated_at = new Date();
   }
 }
-

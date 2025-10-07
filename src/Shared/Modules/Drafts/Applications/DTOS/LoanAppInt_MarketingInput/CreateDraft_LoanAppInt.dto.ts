@@ -112,6 +112,7 @@ export class PayloadDTO {
   @ValidateNested()
   @Type(() => RelativeInternalDto)
   relative_internal?: RelativeInternalDto;
+  marketing_id: number;
 }
 
 export class CreateDraftLoanApplicationDto {

@@ -23,11 +23,11 @@ import { CreditAnalystInternalUseCaseModule } from './Modules/Users/Roles/Credit
     //? --- MySQL Connection ---
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '192.182.6.69',
       port: 3306,
-      username: 'root',
-      password: '',
-      database: process.env.DB_DEV || 'pengajuan_marketing_new',
+      username: 'ardi',
+      password: 'ardi@IT25',
+      database: process.env.DB_DEV || 'pm_js_test',
       autoLoadEntities: true,
       synchronize: true,
       // logging: true, // ini buat lihat query yg dijalankan

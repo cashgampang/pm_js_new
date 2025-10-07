@@ -85,7 +85,7 @@ export class CA_ApproveOrRejectUseCase {
       // Buat entitas approval
       const approval = new ApprovalInternal(
         loan_id,
-        user_id,
+        {id: user_id!},
         role,
         ApprovalInternalStatusEnum.PENDING,
         false,

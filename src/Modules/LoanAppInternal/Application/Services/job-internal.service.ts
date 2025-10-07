@@ -14,7 +14,7 @@ export class JobInternalService {
   async create(dto: CreateJobDto): Promise<JobInternal> {
     const now = new Date();
     const jobs = new JobInternal(
-      dto.nasabah_id,
+      {id: dto.nasabah_id},
       dto.perusahaan,
       dto.divisi,
       dto.golongan,

@@ -15,8 +15,8 @@ export class CollateralValidationService {
    * Validasi apakah riwayat pinjaman penjamin sesuai enum
    */
   static isRiwayatPinjamanValid(collateral: CollateralInternal): boolean {
-    if (!collateral.riwayatPinjamPenjamin) return true; // optional field
-    return Object.values(RiwayatPinjamPenjaminEnum).includes(collateral.riwayatPinjamPenjamin);
+    if (!collateral.riwayat_pinjam_penjamin) return true; // optional field
+    return Object.values(RiwayatPinjamPenjaminEnum).includes(collateral.riwayat_pinjam_penjamin);
   }
 
   /**
@@ -35,7 +35,7 @@ export class CollateralValidationService {
     }
 
     // kalau ada penjamin → harus ada nama + foto KTP minimal
-    return Boolean(collateral.namaPenjamin && collateral.fotoKtpPenjamin);
+    return Boolean(collateral.nama_penjamin && collateral.foto_ktp_penjamin);
   }
 
   /**

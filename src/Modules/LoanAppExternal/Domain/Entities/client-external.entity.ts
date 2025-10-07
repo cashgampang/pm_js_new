@@ -2,7 +2,7 @@ import { GENDER, MARRIAGE_STATUS } from 'src/Shared/Enums/External/Client-Extern
 
 export class ClientExternal {
   constructor(
-    public readonly marketingId: number,
+    public readonly marketing: {id: number},
     public readonly namaLengkap: string,
     public readonly nik: string,
     public readonly noKk: string,

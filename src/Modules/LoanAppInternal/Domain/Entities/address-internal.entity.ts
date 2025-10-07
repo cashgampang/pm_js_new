@@ -8,32 +8,33 @@ import {
 export class AddressInternal {
   constructor(
     // === Immutable (readonly, gak boleh berubah setelah konstruksi) ===
-    public readonly nasabahId: number,
-    public readonly alamatKtp: string,
-    public readonly rtRw: string,
+    public readonly nasabah: {id: number},
+    public readonly alamat_ktp: string,
+    public readonly rt_rw: string,
     public readonly kelurahan: string,
     public readonly kecamatan: string,
     public readonly kota: string,
     public readonly provinsi: string,
-    public readonly statusRumah: StatusRumahEnum,
+    public readonly status_rumah: StatusRumahEnum,
     public readonly domisili: DomisiliEnum,
     public readonly id?: number,
-    public readonly createdAt?: Date,
-    public readonly deletedAt?: Date | null,
+    public readonly created_at?: Date,
+    public readonly deleted_at?: Date | null,
 
     // === Mutable (bisa diupdate) ===
-    public statusRumahKtp?: StatusRumahEnum,
-    public alamatLengkap?: string,
-    public updatedAt?: Date,
+    public status_rumah_ktp?: StatusRumahEnum,
+    public alamat_lengkap?: string,
+    public updated_at?: Date,
   ) {
     this.ensureAlamatLengkap();
+    this.nasabah = typeof nasabah === "number" ? {id: nasabah} : nasabah;
   }
 
   //! Business Rule: Alamat Lengkap wajib kalau domisili ≠ KTP
   private ensureAlamatLengkap(): void {
     if (
       this.domisili === DomisiliEnum.TIDAK_SESUAI_KTP &&
-      !this.alamatLengkap
+      !this.alamat_lengkap
     ) {
       throw new Error(
         'Alamat lengkap harus diisi karena domisili tidak sesuai KTP.',
@@ -47,19 +48,19 @@ export class AddressInternal {
   }
 
   public isOwnedProperty(): boolean {
-    return this.statusRumah === StatusRumahEnum.PRIBADI;
+    return this.status_rumah === StatusRumahEnum.PRIBADI;
   }
 
   public getFullAddress(): string {
     return (
-      this.alamatLengkap ||
-      `${this.alamatKtp}, RT/RW ${this.rtRw}, ${this.kelurahan}, ${this.kecamatan}, ${this.kota}, ${this.provinsi}`
+      this.alamat_lengkap ||
+      `${this.alamat_ktp}, RT/RW ${this.rt_rw}, ${this.kelurahan}, ${this.kecamatan}, ${this.kota}, ${this.provinsi}`
     );
   }
 
   // === Update Hook ===
   public updateAlamatLengkap(alamat: string): void {
-    this.alamatLengkap = alamat;
-    this.updatedAt = new Date();
+    this.alamat_lengkap = alamat;
+    this.updated_at = new Date();
   }
 }

@@ -10,7 +10,7 @@ import { CreateDraftLoanApplicationUseCase } from '../Applications/Services/Loan
   imports: [
     MongooseModule.forFeature(
       [{ name: LoanApplication.name, schema: LoanApplicationSchema }],
-      'mongoConnection', // ⬅️ harus sama dengan AppModule
+      'mongoConnection', 
     ),
   ],
   providers: [

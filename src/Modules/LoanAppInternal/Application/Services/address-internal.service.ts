@@ -18,7 +18,7 @@ export class AddressInternalService {
     const now = new Date();
 
     const address = new AddressInternal(
-      dto.nasabah_id,
+      {id: dto.nasabah_id },
       dto.alamat_ktp,
       dto.rt_rw,
       dto.kelurahan,

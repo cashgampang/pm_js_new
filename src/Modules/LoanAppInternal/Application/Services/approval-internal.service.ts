@@ -16,12 +16,13 @@ export class ApprovalInternalService {
   ) {}
 
   async create(dto: CreateApprovalDto): Promise<ApprovalInternal> {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", dto)
     const now = new Date();
     const address = new ApprovalInternal(
       dto.pengajuan_id,
-      dto.user_id,
+      {id: dto.user_id},
       dto.role,
-      dto.status ?? ApprovalInternalStatusEnum.PENDING,
+      dto.status ? dto.status : ApprovalInternalStatusEnum.PENDING,
       dto.is_banding ?? false,
       undefined,
       dto.keterangan,

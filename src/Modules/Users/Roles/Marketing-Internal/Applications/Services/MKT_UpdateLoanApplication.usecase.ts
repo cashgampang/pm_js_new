@@ -1,6 +1,4 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-
-// Repository Interfaces
 import {
   IClientInternalRepository,
   CLIENT_INTERNAL_REPOSITORY,
@@ -25,19 +23,14 @@ import {
   ICollateralInternalRepository,
   COLLATERAL_INTERNAL_REPOSITORY,
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/collateral-internal.repository';
-
 import {
   IRelativesInternalRepository,
   RELATIVE_INTERNAL_REPOSITORY,
 } from 'src/Modules/LoanAppInternal/Domain/Repositories/relatives-internal.repository';
-
-// File Storage abstraction
 import {
   IFileStorageService,
   FILE_STORAGE_SERVICE,
 } from 'src/Shared/Modules/Storage/Domain/Services/IFileStorage.service';
-
-// Unit of Work abstraction
 import {
   IUnitOfWork,
   UNIT_OF_WORK,
@@ -62,178 +55,94 @@ export class MKT_UpdateLoanApplicationUseCase {
     private readonly relativeRepo: IRelativesInternalRepository,
     @Inject(FILE_STORAGE_SERVICE)
     private readonly fileStorage: IFileStorageService,
-
     @Inject(UNIT_OF_WORK)
     private readonly uow: IUnitOfWork,
   ) {}
 
-  async execute(dto: any, files: any, clientId: number) {
+  async execute(payload: any, files: any, clientId: number) {
     const now = new Date();
+
     try {
       return await this.uow.start(async () => {
-        const {
-          client_internal,
-          address_internal,
-          family_internal,
-          job_internal,
-          loan_application_internal,
-          collateral_internal,
-          relative_internal,
-        } = dto;
+        // Ambil semua sub-payload
+        const clientInternal = payload?.client_internal;
+        const addressInternal = payload?.address_internal;
+        const familyInternal = payload?.family_internal;
+        const jobInternal = payload?.job_internal;
+        const loanAppInternal = payload?.loan_application_internal;
+        const collateralInternal = payload?.collateral_internal;
+        const relativeInternal = payload?.relative_internal;
 
         // 1. Ambil Client
-        const customer = await this.clientRepo.findById(clientId);
-        if (!customer) throw new BadRequestException('Client tidak ditemukan');
-        console.log('I know there things i should know >>>>>',customer);
+        const client = await this.clientRepo.findById(clientId);
+        if (!client) throw new BadRequestException('Client tidak ditemukan');
 
-        // 2. Upload file kalau ada
+        // 2. Upload files
         const filePaths = files
-          ? await this.fileStorage.saveFiles(
-              customer.id!,
-              customer.namaLengkap,
-              files,
-            )
+          ? await this.fileStorage.saveFiles(client.id!, client.nama_lengkap, files)
           : {};
 
-        // 3. Partial update field Client
-        customer.namaLengkap =
-          client_internal?.nama_lengkap ?? customer.namaLengkap;
-        customer.noKtp = client_internal?.no_ktp ?? customer.noKtp;
-        customer.jenisKelamin =
-          client_internal?.jenis_kelamin ?? customer.jenisKelamin;
-        customer.tempatLahir =
-          client_internal?.tempat_lahir ?? customer.tempatLahir;
-        customer.tanggalLahir = client_internal?.tanggal_lahir
-          ? new Date(client_internal.tanggal_lahir)
-          : customer.tanggalLahir;
-        customer.noHp = client_internal?.no_hp ?? customer.noHp;
-        customer.statusNikah =
-          client_internal?.status_nikah ?? customer.statusNikah;
-        customer.email = client_internal?.email ?? customer.email;
-        customer.fotoKtp =
-          filePaths['foto_ktp']?.[0] ??
-          client_internal?.foto_ktp ??
-          customer.fotoKtp;
-        customer.fotoKk =
-          filePaths['foto_kk']?.[0] ??
-          client_internal?.foto_kk ??
-          customer.fotoKk;
-        customer.fotoIdCard =
-          filePaths['foto_id_card']?.[0] ??
-          client_internal?.foto_id_card ??
-          customer.fotoIdCard;
-        customer.fotoRekening =
-          filePaths['foto_rekening']?.[0] ??
-          client_internal?.foto_rekening ??
-          customer.fotoRekening;
-        customer.updatedAt = now;
-
-        await this.clientRepo.save(customer);
-
-        // 4. Partial update Address
-        if (address_internal) {
-          await this.addressRepo.update(customer.id!, {
-            alamatKtp: address_internal.alamat_ktp,
-            kelurahan: address_internal.kelurahan,
-            rtRw: address_internal.rt_rw,
-            kecamatan: address_internal.kecamatan,
-            kota: address_internal.kota,
-            provinsi: address_internal.provinsi,
-            domisili: address_internal.domisili,
-            statusRumahKtp: address_internal.status_rumah_ktp,
-            statusRumah: address_internal.status_rumah,
-            alamatLengkap: address_internal.alamat_lengkap,
-            updatedAt: now,
-          });
+        // Logging jika payload kosong
+        if (
+          !clientInternal &&
+          !addressInternal &&
+          !familyInternal &&
+          !jobInternal &&
+          !loanAppInternal &&
+          !collateralInternal &&
+          !relativeInternal &&
+          Object.keys(filePaths).length === 0
+        ) {
+          console.log('Warning: Tidak ada data yang dikirim. DB tidak berubah.');
         }
 
-        // 5. Partial update Family
-        if (family_internal) {
-          await this.familyRepo.update(customer.id!, {
-            hubungan: family_internal.hubungan,
-            nama: family_internal.nama,
-            bekerja: family_internal.bekerja,
-            namaPerusahaan: family_internal.nama_perusahaan,
-            jabatan: family_internal.jabatan,
-            penghasilan: family_internal.penghasilan,
-            alamatKerja: family_internal.alamat_kerja,
-            noHp: family_internal.no_hp,
-            updatedAt: now,
+        // 3. Update Client
+        if (clientInternal || Object.keys(filePaths).length > 0) {
+          Object.assign(client, {
+            ...clientInternal,
+            foto_ktp: filePaths['foto_ktp']?.[0] ?? client.foto_ktp,
+            foto_kk: filePaths['foto_kk']?.[0] ?? client.foto_kk,
+            foto_id_card: filePaths['foto_id_card']?.[0] ?? client.foto_id_card,
+            foto_rekening: filePaths['foto_rekening']?.[0] ?? client.foto_rekening,
+            updated_at: now,
           });
+          await this.clientRepo.save(client);
+        } else {
+          console.log('Client update skipped (no valid data or files).');
         }
 
-        // 6. Partial update Job
-        if (job_internal) {
-          await this.jobRepo.update(customer.id!, {
-            perusahaan: job_internal.perusahaan,
-            divisi: job_internal.divisi,
-            lamaKerjaTahun: job_internal.lama_kerja_tahun,
-            lamaKerjaBulan: job_internal.lama_kerja_bulan,
-            golongan: job_internal.golongan,
-            yayasan: job_internal.yayasan,
-            namaAtasan: job_internal.nama_atasan,
-            namaHrd: job_internal.nama_hrd,
-            absensi: job_internal.absensi,
-            buktiAbsensi: job_internal.bukti_absensi,
-            updatedAt: now,
-          });
-        } 
+        // 4. Update Address
+        if (addressInternal) {
+          await this.addressRepo.update(client.id!, { ...addressInternal, updated_at: now });
+        }
 
-        // 7. Partial update Loan Application
-        if (loan_application_internal) {
-          const loanApps = await this.loanAppRepo.findByNasabahId(customer.id!);
-          const loanApp = loanApps[0]; // asumsi ada 1 loan application
+        // 5. Update Family
+        if (familyInternal) {
+          await this.familyRepo.update(client.id!, { ...familyInternal, updated_at: now });
+        }
+
+        // 6. Update Job
+        if (jobInternal) {
+          await this.jobRepo.update(client.id!, { ...jobInternal, updated_at: now });
+        }
+
+        // 7. Update Loan Application
+        if (loanAppInternal) {
+          const loanApps = await this.loanAppRepo.findByNasabahId(client.id!);
+          const loanApp = loanApps?.[0];
           if (loanApp) {
-            await this.loanAppRepo.update(loanApp.id!, {
-              statusPinjaman: loan_application_internal.status_pinjaman,
-              pinjamanKe: loan_application_internal.pinjaman_ke,
-              nominalPinjaman: loan_application_internal.nominal_pinjaman,
-              tenor: loan_application_internal.tenor,
-              keperluan: loan_application_internal.keperluan,
-              status: loan_application_internal.status,
-              riwayatNominal: loan_application_internal.riwayat_nominal,
-              sisaPinjaman: loan_application_internal.sisa_pinjaman,
-              notes: loan_application_internal.notes,
-              isBanding: loan_application_internal.is_banding,
-              alasanBanding: loan_application_internal.alasan_banding,
-              updatedAt: now,
-            });
+            await this.loanAppRepo.update(loanApp.id!, { ...loanAppInternal, updated_at: now });
           }
         }
 
-        // 8. Partial update Collateral
-        if (collateral_internal) {
-          await this.collateralRepo.update(customer.id!, {
-            jaminanHrd: collateral_internal.jaminan_hrd,
-            jaminanCg: collateral_internal.jaminan_cg,
-            penjamin: collateral_internal.penjamin,
-            namaPenjamin: collateral_internal.nama_penjamin,
-            lamaKerjaPenjamin: collateral_internal.lama_kerja_penjamin,
-            bagian: collateral_internal.bagian,
-            absensi: collateral_internal.absensi,
-            riwayatPinjamPenjamin: collateral_internal.riwayat_pinjam_penjamin,
-            riwayatNominalPenjamin:
-              collateral_internal.riwayat_nominal_penjamin,
-            riwayatTenorPenjamin: collateral_internal.riwayat_tenor_penjamin,
-            sisaPinjamanPenjamin: collateral_internal.sisa_pinjaman_penjamin,
-            jaminanCgPenjamin: collateral_internal.jaminan_cg_penjamin,
-            statusHubunganPenjamin:
-              collateral_internal.status_hubungan_penjamin,
-            updatedAt: now,
-          });
+        // 8. Update Collateral
+        if (collateralInternal) {
+          await this.collateralRepo.update(client.id!, { ...collateralInternal, updated_at: now });
         }
 
-        // 9. Partial update Relative
-        if (relative_internal) {
-          await this.relativeRepo.update(customer.id!, {
-            kerabatKerja: relative_internal.kerabat_kerja,
-            nama: relative_internal.nama,
-            alamat: relative_internal.alamat,
-            noHp: relative_internal.no_hp,
-            statusHubungan: relative_internal.status_hubungan,
-            namaPerusahaan: relative_internal.nama_perusahaan,
-            updatedAt: now,
-          });
+        // 9. Update Relative
+        if (relativeInternal) {
+          await this.relativeRepo.update(client.id!, { ...relativeInternal, updated_at: now });
         }
 
         return {
@@ -245,8 +154,8 @@ export class MKT_UpdateLoanApplicationUseCase {
           },
         };
       });
-    } catch (err) {
-      console.log('err', err);
+    } catch (err: any) {
+      console.log('Error in UpdateLoanAppUseCase:', err);
       throw new BadRequestException(err.message || 'Gagal update pengajuan');
     }
   }

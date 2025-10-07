@@ -21,7 +21,7 @@ export class AddressInternal_ORM_Entity {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'nasabah_id', foreignKeyConstraintName: 'FK_ClientInternalID_at_AddressInternal' })
-  nasabah_id: ClientInternal_ORM_Entity;
+  nasabah: ClientInternal_ORM_Entity;
   
   @Column({ type: 'varchar', length: 255 })
   alamat_ktp: string;

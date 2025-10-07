@@ -21,7 +21,7 @@ export class AddressInternalRepositoryImpl
   //? All Transactions that using for get datas
   private toDomain(ormEntity: AddressInternal_ORM_Entity): AddressInternal {
     return new AddressInternal(
-      ormEntity.nasabah_id?.id,
+      ormEntity.nasabah,
       ormEntity.alamat_ktp,
       ormEntity.rt_rw,
       ormEntity.kelurahan,
@@ -45,20 +45,20 @@ export class AddressInternalRepositoryImpl
   ): Partial<AddressInternal_ORM_Entity> {
     return {
       id: domainEntity.id,
-      nasabah_id: { id: domainEntity.nasabahId } as ClientInternal_ORM_Entity,
-      alamat_ktp: domainEntity.alamatKtp,
-      rt_rw: domainEntity.rtRw,
+      nasabah: { id: domainEntity.nasabah.id } as ClientInternal_ORM_Entity,
+      alamat_ktp: domainEntity.alamat_ktp,
+      rt_rw: domainEntity.rt_rw,
       kelurahan: domainEntity.kelurahan,
       kecamatan: domainEntity.kecamatan,
       kota: domainEntity.kota,
       provinsi: domainEntity.provinsi,
-      status_rumah: domainEntity.statusRumah,
+      status_rumah: domainEntity.status_rumah,
       domisili: domainEntity.domisili,
-      status_rumah_ktp: domainEntity.statusRumahKtp,
-      alamat_lengkap: domainEntity.alamatLengkap,
-      created_at: domainEntity.createdAt,
-      updated_at: domainEntity.updatedAt,
-      deleted_at: domainEntity.deletedAt,
+      status_rumah_ktp: domainEntity.status_rumah_ktp,
+      alamat_lengkap: domainEntity.alamat_lengkap,
+      created_at: domainEntity.created_at,
+      updated_at: domainEntity.updated_at,
+      deleted_at: domainEntity.deleted_at,
     };
   }
 
@@ -68,24 +68,24 @@ export class AddressInternalRepositoryImpl
   ): Partial<AddressInternal_ORM_Entity> {
     const ormData: Partial<AddressInternal_ORM_Entity> = {};
 
-    if (partial.nasabahId)
-      ormData.nasabah_id = {
-        id: partial.nasabahId,
+    if (partial.nasabah)
+      ormData.nasabah = {
+        id: partial.nasabah.id,
       } as ClientInternal_ORM_Entity;
-    if (partial.alamatKtp) ormData.alamat_ktp = partial.alamatKtp;
-    if (partial.rtRw) ormData.rt_rw = partial.rtRw;
+    if (partial.alamat_ktp) ormData.alamat_ktp = partial.alamat_ktp;
+    if (partial.rt_rw) ormData.rt_rw = partial.rt_rw;
     if (partial.kelurahan) ormData.kelurahan = partial.kelurahan;
     if (partial.kecamatan) ormData.kecamatan = partial.kecamatan;
     if (partial.kota) ormData.kota = partial.kota;
     if (partial.provinsi) ormData.provinsi = partial.provinsi;
-    if (partial.statusRumah) ormData.status_rumah = partial.statusRumah;
+    if (partial.status_rumah) ormData.status_rumah = partial.status_rumah;
     if (partial.domisili) ormData.domisili = partial.domisili;
-    if (partial.statusRumahKtp)
-      ormData.status_rumah_ktp = partial.statusRumahKtp;
-    if (partial.alamatLengkap) ormData.alamat_lengkap = partial.alamatLengkap;
-    if (partial.createdAt) ormData.created_at = partial.createdAt;
-    if (partial.updatedAt) ormData.updated_at = partial.updatedAt;
-    if (partial.deletedAt) ormData.deleted_at = partial.deletedAt;
+    if (partial.status_rumah_ktp)
+      ormData.status_rumah_ktp = partial.status_rumah_ktp;
+    if (partial.alamat_lengkap) ormData.alamat_lengkap = partial.alamat_lengkap;
+    if (partial.created_at) ormData.created_at = partial.created_at;
+    if (partial.updated_at) ormData.updated_at = partial.updated_at;
+    if (partial.deleted_at) ormData.deleted_at = partial.deleted_at;
 
     return ormData;
   }
@@ -98,7 +98,7 @@ export class AddressInternalRepositoryImpl
 
   async findByNasabahId(nasabahId: number): Promise<AddressInternal[]> {
     const ormEntities = await this.ormRepository.find({
-      where: { nasabah_id: { id: nasabahId } },
+      where: { nasabah: { id: nasabahId } },
     });
     return ormEntities.map(this.toDomain);
   }
