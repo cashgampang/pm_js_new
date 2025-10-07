@@ -18,7 +18,7 @@ export class ClientExternalService {
     const now = new Date();
 
     const address = new ClientExternal(
-      dto.marketing_id, // marketingId
+      {id: dto.marketing_id!}, // marketingId
       dto.nama_lengkap, // namaLengkap
       dto.nik, // nik
       dto.no_kk, // noKk

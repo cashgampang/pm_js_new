@@ -5,6 +5,7 @@ import {
 } from '../../../Domain/Repositories/LoanAppInt.repository';
 import { CreateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
 import { LoanApplicationEntity } from '../../../Domain/Entities/LoanAppInt.entity';
+import { UpdateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/UpdateDraft_LoanAppInt.dto';
 
 @Injectable()
 export class CreateDraftLoanApplicationUseCase {
@@ -18,7 +19,8 @@ export class CreateDraftLoanApplicationUseCase {
     dto: CreateDraftLoanApplicationDto,
   ) {
     try {
-      console.log(dto)
+      console.log('📦 Create Draft DTO:', dto);
+
       const loanApp = await this.loanAppDraftRepo.create({
         marketing_id: marketingId,
         client_internal: dto.payload.client_internal,
@@ -47,7 +49,7 @@ export class CreateDraftLoanApplicationUseCase {
               .join(', '),
             reference: 'LOAN_VALIDATION_ERROR',
           },
-          HttpStatus.BAD_REQUEST, // ⬅️ 400 bukan 201
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -58,7 +60,7 @@ export class CreateDraftLoanApplicationUseCase {
             message: `Duplicate field: ${Object.keys(err.keyValue).join(', ')}`,
             reference: 'LOAN_DUPLICATE_KEY',
           },
-          HttpStatus.CONFLICT, // ⬅️ 409 untuk duplicate
+          HttpStatus.CONFLICT,
         );
       }
 
@@ -119,29 +121,44 @@ export class CreateDraftLoanApplicationUseCase {
 
   async updateDraftById(
     Id: string,
-    updateData: Partial<CreateDraftLoanApplicationDto>,
+    updateData: UpdateDraftLoanApplicationDto,
   ) {
+    console.log('🟡 [UPDATE START] ID:', Id);
+    console.log('🟢 [PAYLOAD DITERIMA]:', JSON.stringify(updateData, null, 2));
 
     const { payload } = updateData;
     const entityUpdate: Partial<LoanApplicationEntity> = {
-      ...payload, //spread it
+      ...payload,
     };
+
+    console.log('🧱 [ENTITY YANG AKAN DIUPDATE]:', entityUpdate);
 
     try {
       const loanApp = await this.loanAppDraftRepo.updateDraftById(
         Id,
         entityUpdate,
       );
+
+      console.log('✅ [HASIL UPDATE DARI REPO]:', loanApp);
+
+      if (!loanApp) {
+        console.warn('⚠️ [WARNING] Data tidak ditemukan atau gagal diupdate!');
+      }
+
       return {
         error: false,
-        message: 'Draft loan applications updated',
-        reference: 'LOAN_UPDATE_OK',
+        message: loanApp
+          ? 'Draft loan applications updated'
+          : 'Update executed, but no data was modified',
+        reference: loanApp ? 'LOAN_UPDATE_OK' : 'LOAN_UPDATE_NO_CHANGES',
         data: loanApp,
       };
     } catch (error) {
+      console.error('❌ [UPDATE ERROR]:', error);
+
       return {
         error: true,
-        message: error.message || 'Unexpected error',
+        message: error.message || 'Unexpected error saat update',
         reference: 'LOAN_UNKNOWN_ERROR',
       };
     }

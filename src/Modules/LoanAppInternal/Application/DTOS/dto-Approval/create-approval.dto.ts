@@ -23,7 +23,7 @@ export class CreateApprovalDto {
   role: USERTYPE;
 
   @IsOptional()
-  @IsEnum(ApprovalInternal)
+  @IsEnum(ApprovalInternalStatusEnum)
   status?: ApprovalInternalStatusEnum;
 
   @IsOptional()

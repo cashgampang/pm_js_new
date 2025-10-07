@@ -220,74 +220,81 @@ export class MKT_CreateDraftLoanApplicationUseCase {
   }
 }
 
+async updateDraftById(
+  Id: string,
+  updateData: Partial<CreateDraftLoanApplicationDto>,
+  files?: Record<string, Express.Multer.File[]>,
+) {
+  const { payload } = updateData;
+  let filePaths: Record<string, string[]> = {};
 
+  console.log('🟢 [updateDraftById] START');
+  console.log('➡️ Incoming ID:', Id);
+  console.log('➡️ Incoming Payload:', JSON.stringify(payload, null, 2));
 
-
-  async updateDraftById(
-    Id: string,
-    updateData: Partial<CreateDraftLoanApplicationDto>,
-    files?: Record<string, Express.Multer.File[]>,
-  ) {
-    const { payload } = updateData;
-    let filePaths: Record<string, string[]> = {};
-
-    if (files && Object.keys(files).length > 0) {
-      filePaths = await this.fileStorage.saveDraftsFile(
-        Number(payload?.client_internal?.no_ktp) ?? Id,
-        payload?.client_internal?.nama_lengkap ?? `draft-${Id}`,
-        files,
-      );
-    }
-
-    try {
-      const existingDraft = await this.loanAppDraftRepo.findById(Id);
-      if (!existingDraft) {
-        throw new NotFoundException(`Draft with id ${Id} not found`);
-      }
-
-      const mergedFiles = {
-        ...(existingDraft.uploaded_files || {}),
-        ...(Object.keys(filePaths).length > 0 ? filePaths : {}),
-      };
-
-      const entityUpdate: Partial<LoanApplicationEntity> = {
-        ...payload,
-        uploaded_files: mergedFiles,
-      };
-
-      const loanApp = await this.loanAppDraftRepo.updateDraftById(
-        Id,
-        entityUpdate,
-      );
-
-      throw new HttpException(
-        {
-          payload: {
-            error: false,
-            message: 'Draft loan applications updated',
-            reference: 'LOAN_UPDATE_OK',
-            data: loanApp,
-          },
-        },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      console.log(error);
-
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new HttpException(
-        {
-          payload: {
-            error: true,
-            message: 'Unexpected error',
-            reference: 'LOAN_UNKNOWN_ERROR',
-          },
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  // ✅ Simpan file bila ada upload
+  if (files && Object.keys(files).length > 0) {
+    filePaths = await this.fileStorage.saveDraftsFile(
+      Number(payload?.client_internal?.no_ktp) ?? Id,
+      payload?.client_internal?.nama_lengkap ?? `draft-${Id}`,
+      files,
+    );
   }
+
+  try {
+    const existingDraft = await this.loanAppDraftRepo.findById(Id);
+    console.log('🔍 Existing Draft:', JSON.stringify(existingDraft, null, 2));
+
+    if (!existingDraft) {
+      throw new NotFoundException(`Draft with id ${Id} not found`);
+    }
+
+    const mergedFiles = {
+      ...(existingDraft.uploaded_files || {}),
+      ...(Object.keys(filePaths).length > 0 ? filePaths : {}),
+    };
+
+    const entityUpdate: Partial<LoanApplicationEntity> = {
+      ...payload,
+      uploaded_files: mergedFiles,
+    };
+
+    console.log('🧩 Final entityUpdate to save:', JSON.stringify(entityUpdate, null, 2));
+
+    const loanApp = await this.loanAppDraftRepo.updateDraftById(Id, entityUpdate);
+    console.log('✅ Repository returned:', JSON.stringify(loanApp, null, 2));
+
+    // Verifikasi apakah hasilnya berubah
+    const verifyAfterUpdate = await this.loanAppDraftRepo.findById(Id);
+    console.log('🔁 Data after update in DB:', JSON.stringify(verifyAfterUpdate, null, 2));
+
+    return {
+      payload: {
+        error: false,
+        message: 'Draft loan applications updated',
+        reference: 'LOAN_UPDATE_OK',
+        data: verifyAfterUpdate,
+      },
+    };
+
+  } catch (error) {
+    console.error('❌ Update error:', error);
+
+    if (error instanceof HttpException) {
+      throw error;
+    }
+
+    throw new HttpException(
+      {
+        payload: {
+          error: true,
+          message: 'Unexpected error',
+          reference: 'LOAN_UNKNOWN_ERROR',
+        },
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+}
+
 }

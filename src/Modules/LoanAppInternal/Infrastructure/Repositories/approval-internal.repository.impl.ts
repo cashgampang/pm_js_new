@@ -109,15 +109,22 @@ private toDomain(orm: ApprovalInternal_ORM_Entity): ApprovalInternal {
     return this.toDomain(savedOrm);
   }
 
-  async update(
-    id: number,
-    addressData: Partial<ApprovalInternal>,
-  ): Promise<ApprovalInternal> {
-    await this.ormRepository.update(id, this.toOrmPartial(addressData));
-    const updated = await this.ormRepository.findOne({ where: { id } });
-    if (!updated) throw new Error('Address not found');
-    return this.toDomain(updated);
-  }
+async update(
+  id: number,
+  addressData: Partial<ApprovalInternal>,
+): Promise<ApprovalInternal> {
+  await this.ormRepository.update(id, this.toOrmPartial(addressData));
+
+  const updated = await this.ormRepository.findOne({
+    where: { id },
+    relations: ['pengajuan', 'user'], // penting!
+  });
+
+  if (!updated) throw new Error('Approval not found');
+
+  return this.toDomain(updated);
+}
+
 
   async delete(id: number): Promise<void> {
     await this.ormRepository.softDelete(id);

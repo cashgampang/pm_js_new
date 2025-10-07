@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsDateString,
   IsBoolean,
+  IsDate,
 } from 'class-validator';
 // highlight-start
 // Impor enum dari file entity, bukan mendefinisikannya di sini
@@ -33,6 +34,7 @@ export class CreateClientExternalDto {
   tempat_lahir: string;
 
   @IsDateString()
+  @IsDate()
   tanggal_lahir: Date;
 
   @IsString()

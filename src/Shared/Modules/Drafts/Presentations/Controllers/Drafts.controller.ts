@@ -14,6 +14,7 @@ import { Public } from 'src/Shared/Modules/Authentication/Infrastructure/Decorat
 import { CurrentUser } from 'src/Shared/Modules/Authentication/Infrastructure/Decorators/user.decorator';
 import { JwtAuthGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/jwtAuth.guard';
 import { RolesGuard } from 'src/Shared/Modules/Authentication/Infrastructure/Guards/roles.guard';
+import { UpdateDraftLoanApplicationDto } from '../../Applications/DTOS/LoanAppInt_MarketingInput/UpdateDraft_LoanAppInt.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('drafts')
@@ -42,11 +43,12 @@ export class CreateDraftLoanApplicationController {
     return this.createDraftLoanAppUseCase.deleteDraftByMarketingId(Id);
   }
 
-  @Patch('update/:id')
-  async updateDraftById(
-    @Param('id') Id: string,
-    @Body() updateData: Partial<CreateDraftLoanApplicationDto>,
-  ) {
-    return this.createDraftLoanAppUseCase.updateDraftById(Id, updateData);
-  }
+ @Patch('update/:id')
+async updateDraftById(
+  @Param('id') Id: string,
+  @Body() updateData: UpdateDraftLoanApplicationDto,
+) {
+  return this.createDraftLoanAppUseCase.updateDraftById(Id, updateData);
+}
+
 }
