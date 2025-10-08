@@ -206,7 +206,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
     };
   } catch (error) {
     console.error('DeleteDraft Error >>>', error);
-    throw new HttpException(
+    throw new HttpException(   
       {
         payload: {
           error: true,
@@ -226,6 +226,7 @@ async updateDraftById(
   files?: Record<string, Express.Multer.File[]>,
 ) {
   const { payload } = updateData;
+  console.log("Unified: >", payload)
   let filePaths: Record<string, string[]> = {};
 
   console.log('🟢 [updateDraftById] START');

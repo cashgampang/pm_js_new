@@ -7,6 +7,7 @@ import {
 } from '../../Schemas/LoanAppInternal/CreateLoanApplicaton_Marketing.schema';
 import { ILoanApplicationDraftRepository } from '../../../Domain/Repositories/LoanAppInt.repository';
 import { LoanApplicationEntity } from '../../../Domain/Entities/LoanAppInt.entity';
+import { merge, isEqual } from 'lodash';
 
 @Injectable()
 export class LoanApplicationRepositoryImpl
@@ -40,15 +41,30 @@ export class LoanApplicationRepositoryImpl
     return list.map((doc) => new LoanApplicationEntity(doc.toObject()));
   }
 
-  async updateDraftById(
-    id: string,
-    updateData: Partial<LoanApplicationEntity>,
-  ): Promise<LoanApplicationEntity | null> {
-    const updated = await this.loanAppModel
-      .findByIdAndUpdate(id, updateData, { new: true })
-      .exec();
-    return updated ? new LoanApplicationEntity(updated.toObject()) : null;
+async updateDraftById(
+  id: string,
+  updateData: Partial<LoanApplicationEntity>,
+): Promise<{ entity: LoanApplicationEntity | null; isUpdated: boolean }> {
+  const existing = await this.loanAppModel.findById(id).lean().exec();
+  if (!existing) return { entity: null, isUpdated: false };
+
+  const mergedData = merge({}, existing, updateData);
+
+  const hasChanged = !isEqual(existing, mergedData);
+  if (!hasChanged) {
+    console.log('⚪ Tidak ada perubahan data — skip update');
+    return { entity: new LoanApplicationEntity(existing), isUpdated: false };
   }
+
+  const updated = await this.loanAppModel
+    .findByIdAndUpdate(id, mergedData, { new: true })
+    .exec();
+
+  return {
+    entity: updated ? new LoanApplicationEntity(updated.toObject()) : null,
+    isUpdated: true,
+  };
+}
 
   async softDelete(id: string): Promise<void> {
     await this.loanAppModel.findByIdAndUpdate(id, { isDeleted: true }).exec();

@@ -5,9 +5,6 @@ import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateDraftLoanApplicationDto extends PartialType(CreateDraftLoanApplicationDto) {
-  @ValidateNested()
-  @Type(() => PayloadDTO)
-  payload?: PayloadDTO;
 
   // Tambahkan ini agar bisa terima langsung tanpa "payload"
   client_internal?: any;

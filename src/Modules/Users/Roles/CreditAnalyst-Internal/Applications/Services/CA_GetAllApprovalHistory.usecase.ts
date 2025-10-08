@@ -47,7 +47,7 @@ export class CA_GetAllApprovalHistory_UseCase {
         nama_nasabah: item.nasabah_nama,
         nominal_pinjaman: parseNominalPinjaman[0],
         id_marketing: Number(item.user_id),
-        nama_marketing: item.marketing_nama,
+        nama_marketing: item.marketing_nama,  
         status: item.loan_status,
       }));
 
