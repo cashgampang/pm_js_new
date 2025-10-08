@@ -206,7 +206,7 @@ export class MKT_CreateDraftLoanApplicationUseCase {
     };
   } catch (error) {
     console.error('DeleteDraft Error >>>', error);
-    throw new HttpException(
+    throw new HttpException(   
       {
         payload: {
           error: true,
