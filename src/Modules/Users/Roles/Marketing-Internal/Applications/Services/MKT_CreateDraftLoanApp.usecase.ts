@@ -226,6 +226,7 @@ async updateDraftById(
   files?: Record<string, Express.Multer.File[]>,
 ) {
   const { payload } = updateData;
+  console.log("Unified: >", payload)
   let filePaths: Record<string, string[]> = {};
 
   console.log('🟢 [updateDraftById] START');

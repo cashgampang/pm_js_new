@@ -174,6 +174,8 @@ export class MKT_GetLoanApplicationByIdUseCase {
             foto_kk: loanData.foto_kk,
             foto_id_card: loanData.foto_id_card,
             foto_rekening: loanData.foto_rekening,
+            foto_id_card_penjamin: loanData.foto_id_card_penjamin,
+            foto_ktp_penjamin: loanData.foto_ktp_penjamin,
             bukti_absensi_file: loanData.bukti_absensi_file,
           },
         },

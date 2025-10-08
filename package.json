@@ -37,6 +37,7 @@
     "cookie-parser": "^1.4.7",
     "express-session": "^1.18.1",
     "global": "^4.4.0",
+    "lodash": "^4.17.21",
     "mongoose": "^8.18.0",
     "mysql2": "^3.14.1",
     "passport": "^0.7.0",

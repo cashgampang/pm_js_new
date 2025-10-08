@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Inject, BadRequestException } from '@nestjs/common';
 import {
   CREATE_DRAFT_LOAN_APPLICATION_REPOSITORY,
   ILoanApplicationDraftRepository,
@@ -6,6 +6,7 @@ import {
 import { CreateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/CreateDraft_LoanAppInt.dto';
 import { LoanApplicationEntity } from '../../../Domain/Entities/LoanAppInt.entity';
 import { UpdateDraftLoanApplicationDto } from '../../DTOS/LoanAppInt_MarketingInput/UpdateDraft_LoanAppInt.dto';
+import { isEqual, merge } from 'lodash';
 
 
 @Injectable()
@@ -119,50 +120,77 @@ export class CreateDraftLoanApplicationUseCase {
     }
   }
 
-async updateDraftById(
-  id: string,
-  updateData: any, // langsung body, gak usah DTO dengan payload
-) {
+async updateDraftById(id: string, updateData: any, files?: any) {
   console.log('🟢 [updateDraftById] START');
   console.log('➡️ Incoming ID:', id);
-  console.log('➡️ Incoming Body:', JSON.stringify(updateData, null, 2));
+  console.log('➡️ Incoming Raw Body:', updateData);
 
-  // Ambil draft lama dulu
-  const existing = await this.loanAppDraftRepo.findDraftById(id);
-  if (!existing) throw new Error('❌ Draft not found');
+  const existingDraft = await this.loanAppDraftRepo.findById(id);
+  if (!existingDraft) throw new Error('Draft tidak ditemukan');
 
-  console.log('🔍 Existing Draft:', JSON.stringify(existing, null, 2));
+  console.log('🔍 Existing Draft:', JSON.stringify(existingDraft, null, 2));
 
-  // Gabungkan data lama dengan data baru
-interface DraftEntity {
-  uploaded_files?: Record<string, any>;
-  [key: string]: any;
-}
+  // Ambil payload dari body atau dari updateData.payload
+  let payloadData: any = updateData.payload ?? updateData;
 
-const entityUpdate: DraftEntity = {
-  ...(existing as DraftEntity),
-  ...(updateData as DraftEntity),
-  uploaded_files: {
-    ...((existing as DraftEntity).uploaded_files ?? {}),
-    ...((updateData as DraftEntity).uploaded_files ?? {}),
-  },
-};
+  // Jika payload berupa string (FormData JSON), parse
+  if (typeof payloadData === 'string') {
+    try {
+      payloadData = JSON.parse(payloadData);
+      console.log('✅ Payload parsed from string JSON');
+    } catch (err) {
+      console.error('⚠️ Payload JSON invalid:', err);
+      throw new BadRequestException('Payload JSON tidak valid');
+    }
+  }
 
+  // Ambil file yang dikirim
+  const uploaded_files: Record<string, any> = {};
+  if (files) {
+    for (const [field, fileArray] of Object.entries(files) as [string, Express.Multer.File[]][]) {
+      if (Array.isArray(fileArray) && fileArray.length > 0) {
+        uploaded_files[field] = fileArray.map(f => f.filename);
+      }
+    }
+  }
 
-  console.log('🧩 Final entityUpdate to save:', JSON.stringify(entityUpdate, null, 2));
+  // Merge payload lama dengan payload baru, merge files juga
+  const mergedPayload = merge({}, existingDraft.payload || {}, payloadData);
+  const mergedFiles = merge({}, existingDraft.uploaded_files || {}, uploaded_files);
 
-  // Update langsung ke ORM
-  const updated = await this.loanAppDraftRepo.updateDraftById(id, entityUpdate);
+  const isPayloadChanged = !isEqual(existingDraft.payload, mergedPayload);
+  const isFilesChanged = !isEqual(existingDraft.uploaded_files, mergedFiles);
 
-  console.log('✅ Repository returned:', JSON.stringify(updated, null, 2));
+  if (!isPayloadChanged && !isFilesChanged) {
+    console.log('⚠️ Tidak ada perubahan data. Update dibatalkan.');
+    return {
+      error: true,
+      message: 'Tidak ada data yang diubah',
+      reference: 'LOAN_UPDATE_NO_CHANGES',
+      data: existingDraft,
+    };
+  }
+
+  const entityUpdate: Partial<LoanApplicationEntity> = {
+    payload: mergedPayload,
+    uploaded_files: mergedFiles,
+  };
+
+  console.log('🔍 Final entityUpdate to save:', JSON.stringify(entityUpdate, null, 2));
+
+  const result = await this.loanAppDraftRepo.updateDraftById(id, entityUpdate);
+  console.log('✅ Repository returned:', JSON.stringify(result, null, 2));
 
   return {
     error: false,
-    message: 'Draft loan application updated successfully',
-    data: updated,
+    message: 'Draft loan applications updated',
+    reference: 'LOAN_UPDATE_OK',
+    data: result.entity,
   };
 }
 
 
-
 }
+
+
+

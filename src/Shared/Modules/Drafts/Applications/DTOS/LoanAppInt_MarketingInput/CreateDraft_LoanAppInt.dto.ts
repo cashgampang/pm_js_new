@@ -124,4 +124,7 @@ export class CreateDraftLoanApplicationDto {
   @ValidateNested()
   @Type(() => UploadedFilesDto)
   uploaded_files?: UploadedFilesDto;
+
+
+  
 }
